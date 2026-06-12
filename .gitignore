@@ -1,0 +1,8 @@
+# Workspace state is NEVER part of this public repo.
+# data_projects/ holds your instantiated environment, per-generator project
+# folders, and operational scripts - internal by nature. Keep it untracked,
+# or make it its own PRIVATE git repo cloned into place (see README Setup).
+data_projects/
+
+# Personal Claude Code settings (per-user paths)
+.claude/settings.local.json
