@@ -11,11 +11,13 @@ generator unless explicitly doing a portfolio pass.
 
 ## How to work here
 
-1. **Everything happens inside a project folder.** `data_projects/<name>/` holds the
-   design spec, progress ledger, memory, and review history for one generator.
-   No project folder, no work: create one from `templates/` first. Lessons
-   that generalize get promoted to `playbook/` so every other in-flight
-   generator inherits them.
+1. **Generator work happens inside a project folder.** `data_projects/<name>/`
+   holds the design spec, progress ledger, memory, and review history for one
+   generator; create it from `templates/` before generator work starts.
+   Lessons that generalize get promoted to `playbook/` so every other
+   in-flight generator inherits them. (Questions, discussion, and edits to
+   the playbook itself need no project folder - apply this process to
+   building generators, not to every interaction.)
 2. **Read before acting.** On any task, read `data_projects/ENVIRONMENT.md`
    (shared infra, generator catalog, benchmark targets - instantiate it from
    `templates/environment.md` if missing), then the project's `progress.md`
