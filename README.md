@@ -161,6 +161,10 @@ scripts - lives under `data_projects/`, which is **gitignored here by
 design**. Your internal infra details can never end up in the open-source
 project, even with a careless `git add .`.
 
+(That is also why you will not see a `data_projects/` folder on the hosted
+repo: it does not exist until first use. `/design` creates it locally, and
+it stays local or in your private repo, never here.)
+
 Two ways to run your workspace state:
 
 ```bash
