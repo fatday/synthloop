@@ -9,8 +9,10 @@ hours, the missing piece is almost always offline replayability (stage 2).
 
 ## 3.1 Small-scale generation
 
-- Batch size: enough to measure the coverage spec (hundreds to a few
-  thousand; rare capabilities need enough rows to register).
+- Batch size: enough to measure the coverage spec (typically 500-5000; rare
+  capabilities need enough rows to register). For a FIRST-EVER smoke of a new
+  generator, start tiny (20-50) to catch crashes and format breaks cheaply,
+  then go to the real size once it runs clean.
 - Commit before generating (yes, even smokes).
 - Record: batch id, commit, config, counts, into `progress.md`.
 

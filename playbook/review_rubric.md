@@ -29,7 +29,11 @@ REASONING about sources, not the synthetic sources themselves.
    cut, a "leak" that the full text justifies).
 3. Findings are claims, not verdicts. Every finding goes through a
    refutation pass: an independent reviewer, given the full row, tries to
-   disprove it. Only surviving findings reach the report.
+   disprove it. Only surviving findings reach the report. Track the
+   refutation kill-rate: a high share of findings refuted means the review
+   instruction is too loose and is manufacturing noise - tighten it (next
+   `review_instructions/v*.md`) so reviewers stop raising what the rows do
+   not support.
 
 ## Sampling
 

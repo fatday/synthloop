@@ -6,10 +6,14 @@ designing anything. Output feeds the Context section of the design spec.
 ## Checklist
 
 - [ ] **Environment first**: read `data_projects/ENVIRONMENT.md` (infra,
-      generator catalog, benchmark targets, external resources). Most of the
-      questions below should be answered FROM it; research only what it does
-      not cover, and write what you learn BACK into it (the catalog only
-      stays useful if every project that learns something updates it).
+      generator catalog, benchmark targets, external resources). If it is
+      missing, instantiate it from `templates/environment.md` - run the
+      `playbook/survey.md` procedure to classify the workspace directories
+      (and confirm a data-infra root exists) before filling the rest. Most of
+      the questions below should be answered FROM the environment file;
+      research only what it does not cover, and write what you learn BACK into
+      it (the catalog only stays useful if every project that learns something
+      updates it).
 - [ ] **Target**: what model consumes this data, in what training stage (SFT,
       preference, eval)? What exact serialization format does it train on
       (chat template, tool-call tokens, thinking format)? Get a verbatim

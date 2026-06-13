@@ -3,9 +3,15 @@
 **An agentic playbook for building, reviewing, and iterating LLM data generators.**
 
 synthloop is not a data generation library. It is the *process* around one: a
-stage-by-stage playbook, fill-in templates, and Claude Code skills that let a
-coding agent (with a human in the loop) take a synthetic-data generator from
-idea to large-scale release, with quality that only moves in one direction.
+stage-by-stage playbook and fill-in templates that let a coding agent (with a
+human in the loop) take a synthetic-data generator from idea to large-scale
+release, with quality that only moves in one direction.
+
+The playbook is **agent-agnostic** - any coding agent or a human can run it by
+reading `playbook/` - with **first-class Claude Code support** via the slash
+skills in `.claude/skills/`. Pick a track:
+[Claude Code](#path-a-claude-code-recommended) or
+[any other agent](#path-b-any-other-agent).
 
 ```
 Learn -> Design -> Implement -> [ Small-scale generate -> Automated QA -> Repair ]* -> Scale & Release
@@ -38,8 +44,12 @@ The core bets:
 ## Repository map
 
 ```
-CLAUDE.md                  How a Claude Code agent should operate in this repo
+CLAUDE.md                  Canonical operating guide (agent-neutral; auto-loaded
+                           by Claude Code)
+AGENTS.md                  Entry point for any other agent; routes to CLAUDE.md
+                           and the playbook
 playbook/
+  survey.md                Classify workspace directories (run once / on change)
   00_context.md            Stage 0: learn the domain and the target
   01_design.md             Stage 1: design spec, coverage spec, reality checks
   02_implement.md          Stage 2: generator + offline replay + telemetry hooks
@@ -49,17 +59,21 @@ playbook/
   review_rubric.md         How data review is conducted and reported
 templates/
   environment.md           Workspace-wide context: infra, generator catalog,
-                           benchmark targets (instantiated once per workspace)
+                           benchmark targets. Instantiated once per workspace as
+                           data_projects/ENVIRONMENT.md (note the case change:
+                           lowercase template -> uppercase instance)
   design_spec.md           Per-generator design spec (with mandatory questions)
   review_instruction.md    Versioned review instructions for QA agents
   progress.md              Per-generator progress ledger
   project_memory.md        Per-generator durable memory (decisions, lessons)
+  data_projects_README.md  Seed README copied in when data_projects/ is created
 .claude/skills/            Slash-skills: /survey /design /smoke /review /repair /scale /status
 data_projects/             YOUR workspace state (gitignored here; often its
                            own private repo): one folder per generator
+LICENSE                    MIT
 ```
 
-## Setup
+## Setup (both paths)
 
 synthloop sits NEXT TO your data-generation codebase; it never contains
 generator code. Clone them side by side:
@@ -69,6 +83,18 @@ generator code. Clone them side by side:
   my-data-infra/    # your codebase: generator code, engines, CLI, tests
   synthloop/        # this repo: playbook, skills, per-generator state
 ```
+
+The agent's brain is in synthloop (the playbook + skills); its hands are in
+your infra repo (code, tests, generated data). The division of labor never
+changes: **code, tests, and data live in your repo; specs, ledgers, memory,
+and review history live here.** Your code PRs stay clean of process artifacts,
+and the process state survives any session.
+
+Then pick a path: **Path A (Claude Code)** for the first-class slash-skill
+flow, or **Path B (any other agent)** to drive the same loop by reading the
+playbook.
+
+## Path A: Claude Code (recommended)
 
 Launch Claude Code from synthloop, granting access to your infra repo:
 
@@ -110,13 +136,7 @@ codebase). Without one the agent will stop and ask for it before any
 implementation work; benchmarks, seed corpora, and the rest are optional
 context that sharpen the design when present.
 
-The agent's brain is in synthloop (CLAUDE.md, playbook, skills); its hands
-are in your infra repo (code, tests, generated data). The division of labor
-never changes: **code, tests, and data live in your repo; specs, ledgers,
-memory, and review history live here.** Your code PRs stay clean of process
-artifacts, and the process state survives any session.
-
-## First session
+### First session
 
 Type `/design <your-first-generator>`. The skill notices
 `data_projects/ENVIRONMENT.md` is missing and builds it first - partly by
@@ -124,7 +144,7 @@ interviewing you, mostly by reading your infra repo (the CLI, the generator
 patterns, existing generators to catalog, benchmark targets). Every future
 project and session inherits that knowledge for free.
 
-## The loop, per generator
+### The loop, per generator
 
 ```
 /design my-generator     # interview + spec with coverage numbers -> YOUR approval (gate 1)
@@ -141,7 +161,7 @@ project and session inherits that knowledge for free.
 You show up at the two gates, the open-question queues, and whenever you feel
 like reading rows (keep doing that - it is the highest-yield QA there is).
 
-## Day to day
+### Day to day
 
 - **Resume anything**: new session -> `/status` -> pick a project -> the agent
   reads its `progress.md` "Next action" line and continues. No re-explaining
@@ -152,6 +172,33 @@ like reading rows (keep doing that - it is the highest-yield QA there is).
   `playbook/`, and every in-flight generator inherits them immediately.
 - **Teammates**: clone both repos, run the same two commands, inherit
   everything - the environment file, the playbook, and each project's state.
+
+## Path B: any other agent
+
+Same Setup as above (clone side by side). The Claude Code skills are ergonomic
+sugar, not the substance: the substance is `playbook/` (stages + principles +
+rubric) and `templates/`, plain markdown any coding agent or human can follow.
+
+To run synthloop with a different tool (Codex, Cursor, Gemini CLI, Aider, a
+custom harness):
+
+1. Point your agent at the repo. Tools that read `AGENTS.md` (e.g. Codex) pick
+   up the entry guide automatically; otherwise tell your agent to read
+   `AGENTS.md` first.
+2. `AGENTS.md` routes to `CLAUDE.md` (the canonical, agent-neutral operating
+   rules) and to the `playbook/` stages, with a table mapping each slash skill
+   to "what to do without it" (including the workspace `survey` and `status`
+   steps that have no numbered stage file).
+3. First time, follow the four-step bootstrap in `AGENTS.md`'s "First time"
+   section (create `data_projects/`, copy `templates/data_projects_README.md`
+   into it, run `playbook/survey.md`, instantiate `data_projects/ENVIRONMENT.md`
+   from `templates/environment.md`). Then drive the loop by reading the stage
+   file for each step (`playbook/00_context.md`, `01_design.md`,
+   `03_quality_loop.md`, `04_scale.md`) and following its checklist and exit
+   criteria - the same two human gates apply.
+
+Nothing in `playbook/` or `templates/` depends on Claude Code. The skills just
+save you from naming the file each time.
 
 ## Public framework, private state
 

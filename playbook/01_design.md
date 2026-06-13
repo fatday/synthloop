@@ -36,6 +36,11 @@ implementation surprises mean the spec was incomplete.
 - [ ] **Review instruction v1**: instantiate `templates/review_instruction.md`
       for this generator (what reviewers check, what they ignore).
 - [ ] **Open questions for the human**: collected explicitly, not buried.
+      Interview the human only for what code and data cannot tell you (goals,
+      taste, constraints, risk tolerance); answer everything else by reading
+      the infra repo first, and batch the questions rather than drip them.
+      Where you fill a spec value with your own choice, mark it `(proposed)`
+      so the human can veto it cheaply at the gate.
 
 ## Output
 

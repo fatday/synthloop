@@ -43,6 +43,15 @@ end at launch; it ends at a postmortem that updates the playbook.
 - [ ] If the corpus mixes generations, say so in the release notes, with the
       split key.
 
+## Exit criteria
+
+- Telemetry confirmed every designed capability fired at scale; final
+  dual-track QA and an at-scale raw-row read passed.
+- Data published (only on explicit human request) with batch metadata, and
+  any mixed-generation split key stated.
+- Postmortem written (below): gates added, review instructions and playbook
+  updated, lessons recorded.
+
 ## Postmortem (closes the loop)
 
 - What broke that no gate caught? Add the gate (ratchet).
