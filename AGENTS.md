@@ -46,6 +46,7 @@ that folder and follow this table.
 | `/smoke <name>` | Run the small-scale-generation steps in `playbook/03_quality_loop.md` 3.1 (commit first, generate, coverage tally, raw-row read). |
 | `/review <name>` | Run the dual-track QA in `playbook/03_quality_loop.md` 3.2 + `review_rubric.md` (deterministic checks, agent review with refutation pass + kill-rate, raw-row read, verdict). |
 | `/repair <name>` | Run the diagnose-then-patch steps in `playbook/03_quality_loop.md` 3.4 (diagnosis, scoped fix, ratchet test). |
+| `/cycle <name> [target]` | Run ONE inner-loop iteration end to end: the `/smoke` steps, then the `/review` steps, then — only if findings are prompt/threshold/keyword scope — the `/repair` steps; then decide stop-vs-loop. Stop on: a code-fix-required finding (hand to `/repair`), two consecutive passing cycles (stage-3 human gate), oscillation, or a 6-cycle safety cap. Default pass target = 0.95 Track-A accept-rate. Loop hands-off by repeating this per `playbook/03_quality_loop.md`; never edits code or runs `/scale` on its own. |
 | `/scale <name>` | Run `playbook/04_scale.md` (preflight, launch, monitor, release, postmortem). Requires the scale-up human gate. |
 | `/status [name]` | Read `data_projects/*/progress.md` and print the portfolio table (generator, stage, next action, blocked-on, last-batch verdict); list projects with open questions for the human; flag staleness (a project whose next action has not changed across multiple sessions, or whose last entry is old relative to others). Read-only. |
 
