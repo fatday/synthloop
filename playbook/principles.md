@@ -16,21 +16,44 @@ oversampling sub-perfect scores and refusals. The reader's question is not
 "does this pass the rubric" but "is this what we actually want a model to
 learn".
 
-## 2. Diagnose, then patch
+## 2. Diagnose, then patch — and repair monotonically
 
 Unsupervised repair loops patch the symptom the reviewer measured. They add
 filters and gates until pass-rate looks good while the data distribution
 quietly narrows (the rejection-wall failure: a well-meaning validator that
-silently rejects most honest samples). Scope automated repair to prompts,
-thresholds, and keyword lists. Anything touching code requires: a written
-root-cause diagnosis, the minimal fix, and a new test that would have caught
-it. If you cannot explain why the bug happened, you are not done diagnosing.
+silently rejects most honest samples). The defense is not "a human must touch
+all code" — it is that **autonomous repair may only fix the generator or
+LOOSEN acceptance, never net-tighten it.** Within that constraint the loop may
+edit code, constants, and tune minor design, because it then cannot narrow the
+data behind your back. Every fix requires a written root-cause diagnosis, the
+minimal fix, and — for code — a new test that **fails on the pre-fix commit and
+passes on the fix** (a test that passes pre-fix did not catch the bug). If you
+cannot explain why the bug happened, you are not done diagnosing.
 
-## 3. The ratchet
+What stays a human gate, precisely because it can narrow the data or move the
+target: **any net-tightening of acceptance** (a new/tightened gate, code that
+rejects/drops/filters rows, down-weighting a capability below its floor),
+**relaxing the judge** (a Tier-1 definition, what reviewers flag), **weakening
+a ratchet test**, **scope expansion / creative direction**, and **major design
+pivots**. The loop proposes these with evidence and stops; it never applies them
+alone. Accept-rate is never improvable by losing coverage — the pass test is
+anchored to a frozen coverage floor the loop cannot move (see #5, #9, and
+`03_quality_loop.md` §3.3/§3.5).
+
+## 3. The ratchet (append-only)
 
 Every confirmed incident becomes a permanent deterministic check: a unit test,
 a schema validation, a consistency backstop, a counter with an alert. Quality
 must be monotonic. A bug class fixed without a guard will return.
+
+The ratchet — and the eval/holdout harness — are **append-only for an
+autonomous loop**: it may ADD guards, but may never weaken, skip, xfail,
+delete, or narrow an existing test or its fixtures. A required change to an
+existing ratchet is a human gate. Enforce it mechanically: diff the test files
+each cycle and stop if any existing assertion or fixture was removed or
+loosened. A newly-failing ratchet is made to pass by fixing the generator,
+never by editing the test — otherwise the loop can silently disable the very
+monotonicity guarantee that is the basis for trusting its autonomy.
 
 ## 4. Design for offline replayability
 

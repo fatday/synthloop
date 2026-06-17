@@ -45,14 +45,27 @@ generator unless explicitly doing a portfolio pass.
    `data_projects/` to the synthloop repo, and never copy
    workspace-specific details (infra paths, internal names, quotas) into
    `playbook/` or `templates/` - generalize first.
-6. **Human gates are hard gates.** Design approval and the scale-up go/no-go
-   require an explicit human yes. Present the open questions and stop.
+6. **Human gates are hard gates.** Initial design approval, **major design
+   pivots**, and the scale-up go/no-go require an explicit human yes. The
+   autonomous quality loop (`/cycle`, `/loop /cycle`) runs the inner loop on its
+   own but **stops and hands back at the target checkpoint** for human review
+   and steering, and **proposes-but-never-applies** anything that net-tightens
+   acceptance, relaxes the judge, weakens a ratchet, expands scope, or moves the
+   frozen baseline. Present the open questions and stop.
 
 ## Non-negotiable rules (summary of playbook/principles.md - that file is canonical)
 
 - Read stratified raw rows every QA cycle. Metrics passing is not evidence.
-- Diagnose before patching. Auto-repair touches prompts, thresholds, and
-  keyword lists only; code fixes require a written root cause and a new test.
+- Diagnose before patching, and **repair monotonically**: autonomous repair may
+  fix the generator or LOOSEN acceptance (code included, with a root cause + a
+  test that fails-on-parent/passes-on-fix), but NEVER net-tightens it. Any
+  net-tightening of acceptance, judge relaxation, ratchet weakening, scope
+  expansion, or major pivot is propose-and-stop (human-gated).
+- Accept-rate alone never means pass: the pass test is anchored to a **frozen
+  coverage floor** the loop cannot move, and a cycle that applied any edit
+  cannot pass (validate the fix on a fresh same-commit batch first).
+- The reviewer rubric and the ratchet/eval harness are human-owned and
+  **append-only** for the loop — add or tighten, never relax or weaken.
 - Every confirmed incident becomes a deterministic check or test (the ratchet).
 - Commit the generator code before every launch, smoke or scale (provenance).
 - Every designed behavior gets a usage counter from its first run. A
@@ -64,6 +77,12 @@ generator unless explicitly doing a portfolio pass.
 
 ## What you do NOT do
 
-- Push, publish, or release anything without an explicit human request.
+- Push, publish, or release anything (including `/scale`) without an explicit
+  human request.
+- Net-tighten acceptance, relax the reviewer rubric, weaken/skip/delete a
+  ratchet test, or adopt a scope expansion / creative direction on your own
+  initiative — propose with evidence and stop.
+- Run the loop below the human-set target floor, or edit a frozen baseline
+  section of the design spec (append a dated delta instead).
 - Delete or regenerate existing data on your own initiative.
 - Mark a stage complete when its exit criteria are unmet, however close.
