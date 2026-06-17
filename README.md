@@ -67,7 +67,8 @@ templates/
   progress.md              Per-generator progress ledger
   project_memory.md        Per-generator durable memory (decisions, lessons)
   data_projects_README.md  Seed README copied in when data_projects/ is created
-.claude/skills/            Slash-skills: /survey /design /smoke /review /repair /scale /status
+.claude/skills/            Slash-skills: /survey /design /smoke /review /repair
+                           /cycle /scale /status
 data_projects/             YOUR workspace state (gitignored here; often its
                            own private repo): one folder per generator
 LICENSE                    MIT
@@ -160,6 +161,30 @@ project and session inherits that knowledge for free.
 
 You show up at the two gates, the open-question queues, and whenever you feel
 like reading rows (keep doing that - it is the highest-yield QA there is).
+
+### Running the inner loop hands-off
+
+Typing `/smoke`, `/review`, `/repair` over and over is the manual part. `/cycle`
+collapses one full iteration into a single command, and `/loop` repeats it for
+you until a stop condition:
+
+```
+/cycle my-generator             # one iteration: smoke -> review -> safe-fix, then decide
+/loop /cycle my-generator       # auto-repeat cycles until a hard gate (default target: 95%)
+/loop /cycle my-generator 0.9   # custom Track-A accept-rate target
+```
+
+Each cycle runs the smoke, the dual-track review (with the refutation pass),
+and - **only** for prompt / threshold / keyword-list findings - the repair,
+then loops again. It stops and hands back to you when it should:
+
+- target hit (default 95% accept-rate, no critical findings) -> stops and parks
+  for your review (it never auto-`/scale`s; the stage-3 gate is yours on return),
+- any finding that needs a **code** fix -> human-supervised `/repair`,
+- oscillation (a metric flips twice) or a 6-cycle safety cap.
+
+So the loop is automated only where the playbook allows automation: it never
+edits generator code on its own and never crosses a human gate.
 
 ### Day to day
 

@@ -39,10 +39,12 @@ floor used in the pass test below. Read it as a fraction or a percent.
 
    b. **PASS** — Track-A accept-rate ≥ target AND no surviving critical
       findings AND coverage within spec AND the Track-C read raised nothing
-      new. Record "pass" in the ledger. If this is the **second consecutive**
-      passing cycle, STOP and present the stage-3 human gate (one pass can be
-      luck — see 03_quality_loop exit criteria). If it's the first pass, the
-      loop MAY continue to confirm; say so.
+      new. Record "pass" in the ledger and **STOP**: the human asked to be
+      handed back the moment the target is hit. Present the batch, the verdict,
+      and the accept-rate for human review. Do NOT loop again, and do NOT
+      auto-proceed to `/scale` — the stage-3 human gate (which still wants a
+      confirming second pass before scaling, per 03_quality_loop exit criteria)
+      is the human's call when they return.
 
    c. **SAFE repair** — the only surviving findings are prompt / steering /
       threshold / keyword-list / sampling-weight changes. Run `/repair <name>`
@@ -53,8 +55,9 @@ floor used in the pass test below. Read it as a fraction or a percent.
 
 ## Stop conditions (any one ends the loop)
 
-- Two consecutive passing cycles → **stage-3 human gate** (hard gate; never
-  auto-proceed to `/scale`).
+- Target hit (accept-rate ≥ target, no critical findings, coverage in spec) →
+  **STOP and hand back for human review**. Never auto-proceed to `/scale`; the
+  stage-3 gate (with its confirming second pass) is the human's call on return.
 - A finding needs a **code fix** → hand to `/repair` (human-supervised).
 - **Oscillation**: the same metric flips direction twice across cycles, or the
   same finding-class reappears after a repair claimed to fix it → STOP and
