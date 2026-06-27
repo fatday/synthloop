@@ -1,0 +1,4 @@
+interface:
+  display_name: "Synthloop Smoke"
+  short_description: "Run a small synthloop generation smoke and raw-row read."
+  default_prompt: "Use this skill to smoke-test a synthloop generator."

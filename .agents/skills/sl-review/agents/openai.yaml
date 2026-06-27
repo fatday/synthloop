@@ -1,0 +1,4 @@
+interface:
+  display_name: "Synthloop Review"
+  short_description: "Run synthloop dual-track QA with refutation and raw-row review."
+  default_prompt: "Use this skill to review a synthloop generator batch."

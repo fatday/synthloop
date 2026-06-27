@@ -1,0 +1,4 @@
+interface:
+  display_name: "Synthloop Status"
+  short_description: "Show the synthloop generator portfolio and open human questions."
+  default_prompt: "Use this skill to show synthloop status."

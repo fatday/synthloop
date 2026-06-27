@@ -1,0 +1,4 @@
+interface:
+  display_name: "Synthloop Cycle"
+  short_description: "Run the synthloop quality loop to checkpoint."
+  default_prompt: "Use this skill to run the synthloop quality cycle."

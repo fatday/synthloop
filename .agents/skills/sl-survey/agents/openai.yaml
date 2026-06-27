@@ -1,0 +1,4 @@
+interface:
+  display_name: "Synthloop Survey"
+  short_description: "Classify synthloop workspace directories."
+  default_prompt: "Use this skill to run the synthloop workspace survey."
