@@ -1,0 +1,4 @@
+interface:
+  display_name: "Synthloop Design"
+  short_description: "Design a synthloop generator to the gate."
+  default_prompt: "Use this skill to design a synthloop generator."

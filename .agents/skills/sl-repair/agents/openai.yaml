@@ -1,0 +1,4 @@
+interface:
+  display_name: "Synthloop Repair"
+  short_description: "Diagnose and patch synthloop generator findings."
+  default_prompt: "Use this skill to repair a synthloop generator."

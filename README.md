@@ -9,9 +9,11 @@ release, with quality that only moves in one direction.
 
 The playbook is **agent-agnostic** - any coding agent or a human can run it by
 reading `playbook/` - with **first-class Claude Code support** via the slash
-skills in `.claude/skills/`. Pick a track:
-[Claude Code](#path-a-claude-code-recommended) or
-[any other agent](#path-b-any-other-agent).
+skills in `.claude/skills/` and **first-class Codex support** via repo skills
+in `.agents/skills/`. Pick a track:
+[Claude Code](#path-a-claude-code-recommended),
+[Codex](#path-b-codex), or
+[any other agent](#path-c-any-other-agent).
 
 ```
 Learn -> Design -> Implement -> [ Small-scale generate -> Automated QA -> Repair ]* -> Scale & Release
@@ -69,6 +71,9 @@ templates/
   data_projects_README.md  Seed README copied in when data_projects/ is created
 .claude/skills/            Slash-skills: /survey /design /smoke /review /repair
                            /cycle /scale /status
+.agents/skills/            Codex repo skills: $sl-survey $sl-design
+                           $sl-smoke $sl-review $sl-repair
+                           $sl-cycle $sl-scale $sl-status
 data_projects/             YOUR workspace state (gitignored here; often its
                            own private repo): one folder per generator
 LICENSE                    MIT
@@ -92,8 +97,8 @@ and review history live here.** Your code PRs stay clean of process artifacts,
 and the process state survives any session.
 
 Then pick a path: **Path A (Claude Code)** for the first-class slash-skill
-flow, or **Path B (any other agent)** to drive the same loop by reading the
-playbook.
+flow, **Path B (Codex)** for repo-scoped skills, or **Path C (any other
+agent)** to drive the same loop by reading the playbook.
 
 ## Path A: Claude Code (recommended)
 
@@ -198,18 +203,68 @@ edits generator code on its own and never crosses a human gate.
 - **Teammates**: clone both repos, run the same two commands, inherit
   everything - the environment file, the playbook, and each project's state.
 
-## Path B: any other agent
+## Path B: Codex
+
+Launch Codex from synthloop, and make your data-infra repo accessible in the
+same workspace/session:
+
+```bash
+cd ~/work/synthloop
+codex
+```
+
+Codex reads `AGENTS.md` automatically and discovers repo skills from
+`.agents/skills/`. Invoke synthloop workflows with `/skills` or by mentioning
+the skill name:
+
+```
+$sl-design my-generator
+$sl-smoke my-generator
+$sl-review my-generator
+$sl-repair my-generator
+$sl-cycle my-generator
+$sl-status
+```
+
+The `sl-*` prefix is intentional: Codex has built-in slash commands such as
+`/status` and `/review`, and those are Codex session commands, not synthloop
+workflow commands.
+
+### First session
+
+Start with `$sl-design <your-first-generator>`. If
+`data_projects/ENVIRONMENT.md` is missing, the skill routes through
+`$sl-survey` first, classifies the accessible roots, and instantiates the
+shared environment file.
+
+### The loop, per generator
+
+```
+$sl-design my-generator     # spec + coverage numbers -> YOUR approval
+$sl-smoke my-generator      # commit, small batch, coverage tally, raw-row read
+$sl-review my-generator     # dual-track QA + refutation pass -> verdict
+$sl-repair my-generator     # diagnose-then-patch, ratchet tests
+$sl-cycle my-generator      # smoke -> review -> repair loop to checkpoint
+$sl-scale my-generator      # only after explicit scale-up approval
+$sl-status                  # portfolio dashboard
+```
+
+Everything else is the same contract as Claude Code: `CLAUDE.md` is canonical,
+`playbook/` is the source of truth, human gates are hard gates, and every
+session writes back to `progress.md`.
+
+## Path C: any other agent
 
 Same Setup as above (clone side by side). The Claude Code skills are ergonomic
-sugar, not the substance: the substance is `playbook/` (stages + principles +
-rubric) and `templates/`, plain markdown any coding agent or human can follow.
+sugar, and the Codex skills are the same kind of shortcut. The substance is
+`playbook/` (stages + principles + rubric) and `templates/`, plain markdown any
+coding agent or human can follow.
 
-To run synthloop with a different tool (Codex, Cursor, Gemini CLI, Aider, a
-custom harness):
+To run synthloop with another tool (Cursor, Gemini CLI, Aider, a custom
+harness):
 
-1. Point your agent at the repo. Tools that read `AGENTS.md` (e.g. Codex) pick
-   up the entry guide automatically; otherwise tell your agent to read
-   `AGENTS.md` first.
+1. Point your agent at the repo. Tools that read `AGENTS.md` pick up the entry
+   guide automatically; otherwise tell your agent to read `AGENTS.md` first.
 2. `AGENTS.md` routes to `CLAUDE.md` (the canonical, agent-neutral operating
    rules) and to the `playbook/` stages, with a table mapping each slash skill
    to "what to do without it" (including the workspace `survey` and `status`

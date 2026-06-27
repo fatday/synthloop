@@ -31,24 +31,32 @@ and following it, no tooling required:
 Per-generator state lives under `data_projects/<name>/`, instantiated from
 `templates/`. Read `data_projects/<name>/progress.md` to resume.
 
-## Slash skills are an optional Claude Code convenience
+## Agent-specific shortcuts are optional conveniences
 
-`.claude/skills/` provides ergonomic entry points for Claude Code. Each skill
-routes to the playbook; the "Without it, do this" column below is the
-tool-neutral equivalent, including the few operational details a skill adds on
-top of its stage file. If your tool does not support Claude Code skills, ignore
-that folder and follow this table.
+`.claude/skills/` provides ergonomic entry points for Claude Code.
+`.agents/skills/` provides the Codex equivalents as repo-scoped skills:
+`$sl-survey`, `$sl-design`, `$sl-smoke`, `$sl-review`, `$sl-repair`,
+`$sl-cycle`, `$sl-scale`, and `$sl-status`.
 
-| Skill | Without it, do this |
+In Codex, invoke these via `/skills` or by mentioning the skill name with `$`.
+Do not confuse them with Codex's built-in slash commands such as `/status` or
+`/review`; use the `$sl-*` skills for this playbook.
+
+Each shortcut routes to the playbook; the "Without it, do this" column below is
+the tool-neutral equivalent, including the few operational details a shortcut
+adds on top of its stage file. If your tool does not support skills, ignore the
+shortcut folders and follow this table.
+
+| Shortcut | Without it, do this |
 | --- | --- |
-| `/survey` | Run `playbook/survey.md`: classify each accessible directory (data-infra required, else STOP and ask for it; benchmark/seed-corpus/etc optional); record the table in `data_projects/ENVIRONMENT.md`. |
-| `/design <name>` | Run `playbook/00_context.md` then `01_design.md`; create the project folder from `templates/`; stop at the human design gate. |
-| `/smoke <name>` | Run the small-scale-generation steps in `playbook/03_quality_loop.md` 3.1 (commit first, generate, coverage tally, raw-row read). |
-| `/review <name>` | Run the dual-track QA in `playbook/03_quality_loop.md` 3.2 + `review_rubric.md` (deterministic checks, agent review with refutation pass + kill-rate, raw-row read, verdict). |
-| `/repair <name>` | Run the diagnose-then-patch steps in `playbook/03_quality_loop.md` 3.4 (diagnosis, scoped fix, ratchet test). |
-| `/cycle <name> [target]` | Run ONE inner-loop iteration end to end: the `/smoke` steps, then the `/review` steps, then — only if findings are prompt/threshold/keyword scope — the `/repair` steps; then decide stop-vs-loop. Stop on: a code-fix-required finding (hand to `/repair`), two consecutive passing cycles (stage-3 human gate), oscillation, or a 6-cycle safety cap. Default pass target = 0.95 Track-A accept-rate. Loop hands-off by repeating this per `playbook/03_quality_loop.md`; never edits code or runs `/scale` on its own. |
-| `/scale <name>` | Run `playbook/04_scale.md` (preflight, launch, monitor, release, postmortem). Requires the scale-up human gate. |
-| `/status [name]` | Read `data_projects/*/progress.md` and print the portfolio table (generator, stage, next action, blocked-on, last-batch verdict); list projects with open questions for the human; flag staleness (a project whose next action has not changed across multiple sessions, or whose last entry is old relative to others). Read-only. |
+| `/survey` / `$sl-survey` | Run `playbook/survey.md`: classify each accessible directory (data-infra required, else STOP and ask for it; benchmark/seed-corpus/etc optional); record the table in `data_projects/ENVIRONMENT.md`. |
+| `/design <name>` / `$sl-design` | Run `playbook/00_context.md` then `01_design.md`; create the project folder from `templates/`; stop at the human design gate. |
+| `/smoke <name>` / `$sl-smoke` | Run the small-scale-generation steps in `playbook/03_quality_loop.md` 3.1 (commit first, generate, coverage tally, raw-row read). |
+| `/review <name>` / `$sl-review` | Run the dual-track QA in `playbook/03_quality_loop.md` 3.2 + `review_rubric.md` (deterministic checks, agent review with refutation pass + kill-rate, raw-row read, verdict). |
+| `/repair <name>` / `$sl-repair` | Run the diagnose-then-patch steps in `playbook/03_quality_loop.md` 3.4 (diagnosis, scoped fix, ratchet test). |
+| `/cycle <name> [target]` / `$sl-cycle` | Run the smoke → review → repair loop according to `playbook/03_quality_loop.md` 3.1-3.5. Stop at pass checkpoint, hard gate, rejection-wall signal, oscillation, regression, infra failure, or safety cap. Pass requires both Track A and Track B to clear target independently with coverage floors intact. Never auto-scale. |
+| `/scale <name>` / `$sl-scale` | Run `playbook/04_scale.md` (preflight, launch, monitor, release, postmortem). Requires the scale-up human gate. |
+| `/status [name]` / `$sl-status` | Read `data_projects/*/progress.md` and print the portfolio table (generator, stage, next action, blocked-on, last-batch verdict); list projects with open questions for the human; flag staleness (a project whose next action has not changed across multiple sessions, or whose last entry is old relative to others). Read-only. |
 
 ## First time
 

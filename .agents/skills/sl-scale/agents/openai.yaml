@@ -1,0 +1,4 @@
+interface:
+  display_name: "Synthloop Scale"
+  short_description: "Run synthloop scale-up after human approval."
+  default_prompt: "Use this skill to scale a synthloop generator."
