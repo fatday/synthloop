@@ -1,5 +1,7 @@
 # synthloop
 
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/b84fdbea-c99a-419a-ac46-51603c1507c7" />
+
 **An agentic playbook for building, reviewing, and iterating LLM data generators.**
 
 synthloop is not a data generation library. It is the *process* around one: a
