@@ -1,25 +1,16 @@
 ---
 name: status
-description: Portfolio dashboard - show every generator in data_projects/ with its stage, next action, blockers, and latest batch verdict. Usage - /status [generator-name]
+description: Read synthloop project or portfolio status, active jobs, blockers and open human questions.
 ---
 
-# /status [generator-name]
+# Synthloop Status
 
-With a name: print that project's full `progress.md` header, latest batch
-ledger row, latest review verdict, and open questions.
+Read `CLAUDE.md` and `playbook/principles.md`, then follow the **status**
+workflow in `playbook/workflows.md` and its referenced stage files. Resolve
+these paths from the synthloop repository root, not the generator codebase.
+Use `playbook/runtime.md` for state, evidence and shared executable checks;
+use `playbook/platforms.md` only for platform-specific execution or scheduling.
 
-Without a name (portfolio view):
-
-1. For every `data_projects/*/progress.md`, read the Current State header and
-   the last batch ledger row.
-2. Print one table:
-
-   | Generator | Stage | Next action | Blocked on | Last batch (verdict) |
-
-3. Below the table, list every project with open questions for the human,
-   questions inline. These are the human's queue; surface them prominently.
-4. Flag staleness: any project whose last session-ledger entry is old
-   relative to the others, or whose next action has not changed across
-   multiple sessions (a sign the loop is stuck or abandoned).
-
-Read-only: this skill never modifies project files.
+The project name and optional parameters come from the user's request. Resume
+existing state and honor matching recorded authorization. Workflow rules and
+pass criteria are defined in the shared playbook, not in this adapter.

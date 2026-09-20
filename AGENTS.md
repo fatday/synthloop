@@ -16,8 +16,8 @@ drift from; `CLAUDE.md` is canonical.
 ## Stages live in `playbook/`
 
 The work is a five-stage loop, preceded by a one-time workspace survey. Each
-file is a self-contained checklist with exit criteria - runnable by reading it
-and following it, no tooling required:
+file defines a checklist with exit criteria. Shared offline helpers in `tools/`
+validate persisted state, batch evidence and scale gates:
 
 - `playbook/survey.md` - classify workspace directories (run once / on change)
 - `playbook/00_context.md` - learn the domain and target
@@ -27,9 +27,13 @@ and following it, no tooling required:
 - `playbook/04_scale.md` - scale-up, monitoring, release, postmortem
 - `playbook/principles.md` - the distilled rules (read first)
 - `playbook/review_rubric.md` - how review is conducted and reported
+- `playbook/workflows.md` - common command workflows for both skill adapters
+- `playbook/runtime.md` - state, manifests, recovery and executable checks
+- `playbook/platforms.md` - Claude Code and Codex integration details
 
 Per-generator state lives under `data_projects/<name>/`, instantiated from
-`templates/`. Read `data_projects/<name>/progress.md` to resume.
+`templates/`. Read state.json, progress.md and project_memory.md; run the
+shared resume helper before continuing an active project.
 
 ## Agent-specific shortcuts are optional conveniences
 
@@ -54,7 +58,7 @@ shortcut folders and follow this table.
 | `/smoke <name>` / `$sl-smoke` | Run the small-scale-generation steps in `playbook/03_quality_loop.md` 3.1 (commit first, generate, coverage tally, raw-row read). |
 | `/review <name>` / `$sl-review` | Run the dual-track QA in `playbook/03_quality_loop.md` 3.2 + `review_rubric.md` (deterministic checks, agent review with refutation pass + kill-rate, raw-row read, verdict). |
 | `/repair <name>` / `$sl-repair` | Run the diagnose-then-patch steps in `playbook/03_quality_loop.md` 3.4 (diagnosis, scoped fix, ratchet test). |
-| `/cycle <name> [target]` / `$sl-cycle` | Run the smoke → review → repair loop according to `playbook/03_quality_loop.md` 3.1-3.5. Stop at pass checkpoint, hard gate, rejection-wall signal, oscillation, regression, infra failure, or safety cap. Pass requires both Track A and Track B to clear target independently with coverage floors intact. Never auto-scale. |
+| `/cycle <name> [target]` / `$sl-cycle` | Run the smoke → review → repair loop according to `playbook/03_quality_loop.md` 3.1-3.6. Use joint row-level pass rates over the full batch and frozen cohort floors. Confirm the first clean pass with a fresh seed; stop after two consecutive clean passes or a hard stop. Never auto-scale. |
 | `/scale <name>` / `$sl-scale` | Run `playbook/04_scale.md` (preflight, launch, monitor, release, postmortem). Requires the scale-up human gate. |
 | `/status [name]` / `$sl-status` | Read `data_projects/*/progress.md` and print the portfolio table (generator, stage, next action, blocked-on, last-batch verdict); list projects with open questions for the human; flag staleness (a project whose next action has not changed across multiple sessions, or whose last entry is old relative to others). Read-only. |
 

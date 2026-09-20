@@ -9,25 +9,45 @@ hours, the missing piece is almost always offline replayability (stage 2).
 
 ## 3.1 Small-scale generation
 
-- Batch size: enough to measure the coverage spec (typically 500-5000; rare
-  capabilities need enough rows to register). For a FIRST-EVER smoke of a new
-  generator, start tiny (20-50) to catch crashes and format breaks cheaply,
-  then go to the real size once it runs clean.
-- Commit before generating (yes, even smokes).
-- Record: batch id, commit, config, counts, into `progress.md`.
+- Read `state.json` and run the resume procedure in `runtime.md` before launch.
+  Reconcile active jobs and incomplete reviews; never blindly regenerate.
+- **Functional smoke**: 20-50 rows, with directed cases for every designed
+  capability. This checks crashes, format and reachable paths; it is not a
+  distribution estimate and cannot count as a clean validation pass.
+- **Validation batch**: use the approved minimum total and per-cohort sample
+  sizes, coverage floors, target and drift budget from `baseline.json`.
+  Typically 500-5000 rows; rare capabilities need more observations or directed
+  tests. Under independent sampling, a 1% capability is absent in 50 rows about
+  61% of the time. Zero observations in an undersized random sample means
+  insufficient evidence, not proof of a broken capability.
+- Commit before generating (yes, even smokes); verify a clean infra worktree.
+- Reserve batch/job identity before submission. Retain the full raw batch and
+  generated-row inventory BEFORE filtering, including rejected rows. Record
+  failed attempts, retries and spend separately.
+- Pin the code, framework, model and input hashes using run_manifest.json;
+  persist job handles/cursors in state and a short summary in progress.md.
 
 ## 3.2 Automated QA (dual-track, every cycle)
 
 **Track A - deterministic checks** (cheap, run first):
-- Schema validation, required fields, format round-trips.
-- Coverage histogram vs the design spec's numbers. Every capability counter
-  above its floor. A zero where the spec expects usage is a HARD FAIL.
+- Schema validation, required fields, format round-trips over ALL emitted rows,
+  including rejects, not just accepted survivors.
+- Coverage histogram vs frozen floors and minimum sample sizes. A directed
+  capability test that cannot fire is a failure. An undersized random sample
+  needs more evidence; a sufficiently sized batch below a floor fails validation.
 - Consistency backstops accumulated by the ratchet (see 3.4).
 - Accept/reject rate vs previous batch (rejection-wall watch).
 
 **Track B - agent review** (semantic):
-- Chunk the batch (25-50 rows per reviewer) using the current
-  `review_instructions/v*.md`.
+- Chunk the full validation batch using the pinned evaluation rubric. Start
+  with 25-50 rows per reviewer, reducing chunk size to fit full rows within the
+  context budget. Never truncate a row; route oversized rows explicitly.
+- Persist planned/completed chunk IDs and evidence. Reviewers receive the task
+  spec and raw rows in a separate context, without the generator's repair
+  rationale. Refuters see the claim and full row, not a desired outcome.
+- New review instructions are candidate versions evaluated in shadow mode until
+  a human checkpoint adopts them. Discovery findings remain visible even when
+  the pinned rubric does not yet cover the class; new raw-row concerns block pass.
 - Reviewers must cite row ids and verbatim offending content.
 - **Refutation pass**: an independent reviewer attempts to disprove each
   finding against the full raw row. Only surviving findings are reported.
@@ -48,22 +68,32 @@ target by *cheating* — rejecting honest-but-imperfect rows, shedding a hard
 capability — so the pass test is anchored to a coverage floor that the loop
 cannot move:
 
-Pass =
-- accept-rate ≥ target, measured over the **FULL generated batch** (not the
-  post-gate survivor set), AND
-- **every baseline coverage cell ≥ its frozen floor** (a rise in accept-rate
-  with any cell shrinking is a rejection-wall signal, not a pass), AND
-- cumulative coverage **drift within budget** vs the frozen baseline, AND
-- no surviving critical findings (scored with the rubric version **pinned to
-  the last human checkpoint**, not one this loop edited), AND
-- the raw-row read raises nothing new, AND
-- this is a **clean cycle** — no code/constant/design edit was applied, so the
-  reviewed rows came from current HEAD.
+Define N as all emitted rows, including rejects. Always report A_pass/N,
+B_pass/B_reviewed, reviewed sample size, and (for full review) joint_pass/N.
+A and B each passing 95% is not enough: disjoint failures can leave joint pass
+at 90%. Unreviewed B rows are unknown, never assumed good. At-scale sampled
+reviews report the approved sampling estimator and uncertainty separately;
+they do not count as full-validation passes in the shared helper.
 
-A pass reached autonomously is **provisional**: present summary, examples, the
-coverage/drift table, and open questions to the human, whose review at the
-checkpoint is the authoritative confirmation. Human approves → stage 4.
-Anything else → 3.4. Never auto-scale.
+A clean validation pass requires all of:
+- Full Track-A and Track-B review, with **joint_pass/N >= target**, AND
+- every cohort has sufficient observations, joint rate >= target, and joint
+  accepted count >= its frozen floor, AND
+- cumulative total-variation distance of accepted cohort shares vs the frozen
+  baseline is within the approved budget, AND
+- no surviving critical findings under the pinned evaluation rubric, AND
+- refutation, ratchets and the raw-row read are complete with no new concerns, AND
+- no code/config/prompt/design edit during the cycle; the rows match current
+  committed code and pinned inputs.
+
+Use `tools/synthloop.py check-batch` and `record-review` per `runtime.md`.
+The first clean pass transitions to **pass_1** and schedules an independent
+confirmation batch (new seed, same code/config/rubric/model/baseline). The second
+consecutive clean pass transitions to **ready_for_approval** and stops for human
+review. A failed/edited cycle resets the streak; a changed fingerprint starts a
+new streak. Duplicate batches or repeated seeds cannot satisfy two passes.
+Human approval is bound to the concrete scale plan, not just a generic pass.
+Never auto-scale.
 
 ## 3.4 Repair: diagnose, then patch (monotonic)
 
@@ -72,9 +102,10 @@ Anything else → 3.4. Never auto-scale.
   symptom go away" is not a diagnosis.
 - **Autonomous (apply directly): fix the generator, or LOOSEN acceptance.**
   Prompt/steering wording, relaxing an over-strict threshold/keyword/gate,
-  fixing a parser/scorer/schema so honest rows pass, raising a coverage
-  weight/floor. Code changes get a minimal fix + a NEW test that **fails on the
-  parent commit and passes on the fix** (a test that passes pre-fix is not a
+  fixing a parser/scorer so honest rows pass, or improving demand-side
+  steering within the approved surface and coverage budget. Frozen schema and
+  floors do not change autonomously. Code changes get a minimal fix + a NEW test
+  that **fails on the parent commit and passes on the fix** (a test that passes pre-fix is not a
   ratchet) + the suite. Minor design tuning is written to the spec's
   append-only AUTONOMOUS-DELTA section, never into frozen text.
 - **Human-gated (propose + STOP, never apply autonomously): anything that
@@ -97,20 +128,25 @@ Anything else → 3.4. Never auto-scale.
 - **Adversarial verification of the fix**: an independent pass must try to show
   the fix raised accept-rate by excluding honest rows rather than improving the
   generator — read the newly-rejected rows verbatim and certify they are
-  genuinely-bad. Cannot certify → present to the human, do not keep the fix.
+  genuinely-bad. Use the SAME retained rows for before/after acceptance, not
+  unrelated random batches. For newly accepted rows, require the pinned semantic
+  checks too: loosening acceptance alone is not evidence of improved quality.
+  Cannot certify → present to the human, do not keep the fix.
 - **Provenance**: commit + stamp the hash; the edit invalidates the prior
   commit's rows (do not count them); replay scoring/parsing/schema changes
   against retained prior rows and record a cutover if they would now re-label
-  accepted rows. Reviewer-instruction edits are additive/tightening only.
+  accepted rows. Retain old rows for replay/audit; do not delete them. Candidate
+  reviewer edits are additive/tightening only and do not replace the pinned
+  evaluation rubric until an authorized checkpoint.
 - Record diagnosis + change + minor/major rationale in `project_memory.md`.
 
 Then loop to 3.1.
 
 ## 3.5 Autonomous-loop guard rails (the basis for safe autonomy)
 
-The loop may fix code, constants, and tune minor design without a human, but
-only because these invariants make it impossible to narrow the data unseen.
-They REPLACE the human code-reviewer between checkpoints; they are not optional.
+The loop may fix code, constants, and tune minor design without a human inside
+these constraints. Verify the evidence with the shared helper and independent
+review; written invariants alone do not enforce themselves.
 
 1. **Frozen baseline.** Approved spec sections (goals/non-goals, schema,
    coverage categories + floors), the coverage histogram, and the target floor
@@ -121,9 +157,9 @@ They REPLACE the human code-reviewer between checkpoints; they are not optional.
    acceptance (see 3.4). Accept-rate is never improvable by losing coverage.
 3. **Append-only judge & ratchet.** Reviewer rubric and ratchet tests are
    human-owned: additive/tightening edits only; relaxations are human-gated.
-   The pass test is scored on the pinned rubric. Tier-1 critical definitions are
-   pinned to the last checkpoint and exempt from kill-rate-driven loosening
-   (that lever applies to Tier-2/3 only).
+   The pass test is scored on the pinned rubric. Any change that makes a real
+   failure easier to pass, at any tier, requires human approval. A high refutation
+   kill-rate prompts evidence/instruction diagnosis, not automatic relaxation.
 4. **Provenance: clean-cycle-to-pass.** Edits invalidate prior rows and are
    committed; new tests fail-on-parent/pass-on-fix; a cycle that edited anything
    cannot pass. At loop entry record the rollback anchor (last human-approved
@@ -131,13 +167,28 @@ They REPLACE the human code-reviewer between checkpoints; they are not optional.
 5. **Repair, not expand.** Autonomy restores quality on the approved surface;
    scope expansion and creative direction are proposed and surfaced at the
    checkpoint, applied only with explicit human direction. A cumulative drift
-   budget (TV-distance vs baseline, default 0.20, or > 3 net-new autonomous
-   subtypes) forces a hard gate even when each step looked minor.
+   budget (TV-distance vs baseline, proposed default 0.20) forces a hard gate
+   even when each step looked minor. New scope is proposed, not accumulated
+   through autonomous additions.
 
 `target-pass-rate` has a human-set floor in the spec; the loop may not run below
 it, and lowering the floor is a hard gate. A STOP-to-diagnose may resume only if
 the resolution is a generator/data fix; if the only way forward is to weaken a
 gate/threshold/rubric/test, the loop stays stopped and presents to the human.
+
+## 3.6 Stop, budget and recovery
+
+Persist the cycle cursor after each sub-stage. Stop on a hard gate, confirmed
+regression/oscillation, ratchet failure, unreconciled infrastructure failure, or
+approved cycle/cost/time cap (proposed default: six validation cycles). A
+transient failure can be retried only under the approved bounded retry policy,
+after checking the existing job identity. Monitor in-flight spend too.
+
+Every stop records the reason, current HEAD, rollback anchor, autonomous commits,
+coverage/joint-rate deltas and one next action. Cancel the actual scheduled
+wakeup/job when using a platform loop; a Markdown next-action change is not
+cancellation. Follow `platforms.md` and `runtime.md`. Completion at the second
+clean pass still requires human checkpoint review and separate scale approval.
 
 ## Exit criteria (human gate)
 
@@ -157,7 +208,9 @@ gate/threshold/rubric/test, the loop stays stopped and presents to the human.
   green, the human seeing only survivors. Monotonicity + frozen baseline +
   append-only judge/ratchet + clean-cycle-to-pass are the antidote; if any feels
   inconvenient mid-loop, that is the failure mode arriving, not an exception.
-- Repair loops that oscillate: two tweaks fighting across cycles. If the same
-  metric flips twice, stop and diagnose.
+- Mistaking sampling noise for regression: a cell falling relative to the last
+  random batch is not itself a stop condition. Check frozen floors, sample size,
+  drift budget and paired replay. Recurrence of a confirmed defect or opposing
+  fixes on matched evidence is an oscillation stop, not two noisy metric flips.
 - Reviewer findings taken at face value: without the refutation pass,
   plausible-but-wrong findings consume repair cycles.

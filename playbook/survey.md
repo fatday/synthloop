@@ -1,6 +1,6 @@
 # Workspace survey
 
-**Purpose**: classify every directory the agent can reach, so later stages
+**Purpose**: classify user-designated workspace roots, so later stages
 know which repo is the generation infra, which is a benchmark, which is seed
 data. Run once when a workspace is set up, and again whenever directories are
 added. Feeds the "Workspace directories" table in `data_projects/ENVIRONMENT.md`.
@@ -10,8 +10,9 @@ run it by following the steps below.)
 
 ## Procedure
 
-1. Enumerate accessible roots: the current workspace plus every additional
-   directory the session can reach.
+1. Enumerate the project workspace and explicitly supplied additional roots.
+   Filesystem readability is not a request to survey the user's entire home or
+   machine. Inspect top-level metadata first; expand only relevant roots.
 2. For each root, classify by INSPECTION (read the README, the project config -
    pyproject/package.json/Makefile - and the top-level structure; do NOT guess
    from the directory name). Roles:

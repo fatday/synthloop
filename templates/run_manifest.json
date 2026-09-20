@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "batch_id": null,
+  "purpose": "validation",
+  "generator_commit": null,
+  "framework_commit": null,
+  "model_id": null,
+  "seed": null,
+  "generated_count": null,
+  "inventory": {"path": null, "sha256": null},
+  "data": {"path": null, "sha256": null},
+  "inputs": {
+    "config": {"path": null, "sha256": null},
+    "prompt": {"path": null, "sha256": null},
+    "rubric": {"path": null, "sha256": null},
+    "contract": {"path": null, "sha256": null},
+    "launcher": {"path": null, "sha256": null},
+    "dependencies": {"path": null, "sha256": null}
+  }
+}

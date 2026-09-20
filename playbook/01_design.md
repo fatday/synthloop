@@ -15,6 +15,11 @@ implementation surprises mean the spec was incomplete.
 - [ ] **Behavior coverage spec** (REQUIRED): the target distribution as
       numbers - task categories with weights, turn-type mix, difficulty mix,
       expected per-capability usage floor. This is what QA measures against.
+- [ ] **Executable baseline**: instantiate baseline.json with mutually exclusive
+      cohorts, joint-rate target, accepted-count floors, minimum sample sizes,
+      accepted-share baseline, drift and cycle/cost/time budgets. Include
+      directed functional tests for rare capabilities; distinguish random
+      distribution estimates from path reachability tests.
 - [ ] **Demand-side wiring**: for every capability in the coverage spec, what
       mechanism creates demand for it (steering lines, scenario seeds,
       weights)? Capabilities without a demand mechanism ship dark.
@@ -35,6 +40,10 @@ implementation surprises mean the spec was incomplete.
       external dependency, so the QA loop can run without live calls.
 - [ ] **Review instruction v1**: instantiate `templates/review_instruction.md`
       for this generator (what reviewers check, what they ignore).
+- [ ] **Evaluation independence**: define reviewer/refuter inputs and execution,
+      human-labeled calibration cases, held-out evaluation, deduplication and
+      benchmark contamination checks. State whether a small training ablation
+      will test downstream value; record a reason if deferred.
 - [ ] **Open questions for the human**: collected explicitly, not buried.
       Interview the human only for what code and data cannot tell you (goals,
       taste, constraints, risk tolerance); answer everything else by reading
@@ -52,7 +61,10 @@ implementation surprises mean the spec was incomplete.
 - A human has read the spec and answered the open questions.
 - The coverage spec has numbers, the Reality Checks have answers, and the
   schema has a worked example.
-- Explicit human approval recorded in `progress.md`.
+- Explicit human approval recorded against baseline.json's hash in state.json
+  and summarized in progress.md. Pin the evaluation rubric and approved contract
+  SHA-256 (export sections 1-5 as approved_contract.md). New rubric
+  candidates run in shadow until an authorized checkpoint; see runtime.md.
 
 ## Common failure modes
 

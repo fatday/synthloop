@@ -27,17 +27,21 @@ generator unless explicitly doing a portfolio pass.
 2. **Read before acting.** On any task, read `data_projects/ENVIRONMENT.md`
    (shared infra, generator catalog, benchmark targets - instantiate it from
    `templates/environment.md` if missing), then the project's `progress.md`
-   (current stage, next action, open questions) and `project_memory.md`
-   (decisions and lessons) before doing anything else.
+   (human summary), `state.json` (machine resume cursor), and `project_memory.md`
+   (decisions and lessons). Use `playbook/runtime.md` to reconcile active jobs
+   and incomplete reviews before launching anything. Framework discussion and
+   maintenance do not require creating generator workspace state.
 3. **Stages are entered through skills (Claude Code) or by reading the
    playbook directly (any agent).** `/design`, `/smoke`, `/review`, `/repair`,
    `/scale` are thin routers that load their stage's checklist from
    `playbook/`; without them, open the matching `playbook/` file yourself
    (see `AGENTS.md` for the mapping). Either way, follow the checklist; the
    exit criteria are not optional.
-4. **Write back before ending.** Every working session ends by updating
-   `progress.md` (what happened, current stage, the single next action) and,
-   if a decision or lesson was made, `project_memory.md`. If `data_projects/`
+4. **Write back before ending.** Generator work persists `state.json` at
+   sub-stage transitions and updates `progress.md` (what happened, current stage,
+   the single next action) before ending. If a decision or lesson was made,
+   update `project_memory.md` too. Read-only status and framework maintenance
+   do not write generator state. If `data_projects/`
    is its own git repo, commit your state updates there (`git -C
    data_projects ...`).
 5. **Public/private boundary.** `data_projects/` is workspace state and is
@@ -48,7 +52,7 @@ generator unless explicitly doing a portfolio pass.
 6. **Human gates are hard gates.** Initial design approval, **major design
    pivots**, and the scale-up go/no-go require an explicit human yes. The
    autonomous quality loop (`/cycle`, `/loop /cycle`) runs the inner loop on its
-   own but **stops and hands back at the target checkpoint** for human review
+   own but **stops after two consecutive clean passes** for human review
    and steering, and **proposes-but-never-applies** anything that net-tightens
    acceptance, relaxes the judge, weakens a ratchet, expands scope, or moves the
    frozen baseline. Present the open questions and stop.
@@ -68,8 +72,8 @@ generator unless explicitly doing a portfolio pass.
   **append-only** for the loop — add or tighten, never relax or weaken.
 - Every confirmed incident becomes a deterministic check or test (the ratchet).
 - Commit the generator code before every launch, smoke or scale (provenance).
-- Every designed behavior gets a usage counter from its first run. A
-  capability with zero observed usage is a bug, not a maybe.
+- Every designed behavior gets a usage counter and a directed smoke case.
+  Random-batch coverage verdicts require the approved minimum sample sizes.
 - Review findings get an adversarial refutation pass before they are reported.
   Evidence is full and verbatim, never truncated.
 - Never write false claims about tool or environment behavior into prompts.

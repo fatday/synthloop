@@ -37,6 +37,13 @@
 
 - Turn-type / difficulty mix:
 - What QA measures this against (script/command):
+- Mutually exclusive cohort definitions used by the shared checker:
+- Directed functional smoke cases for rare capabilities:
+- Minimum total / per-cohort validation sample sizes:
+- Joint pass-rate target and per-cohort accepted-count floors:
+- Frozen accepted-distribution shares / maximum TV-distance:
+- Cycle / cost / wall-time limits and bounded retry policy:
+- Machine-readable baseline: `baseline.json` (proposed until approved):
 
 ## 5. Quality rules
 
@@ -62,7 +69,39 @@
 
 - Link: `review_instructions/v1.md`
 - Generator-specific reviewer guidance (what to check, what to ignore):
+- Pinned evaluation rubric version / SHA-256:
+- Candidate rubric version (shadow only, if any):
+- Independent review/refutation execution and evidence locations:
 
 ## 9. Open questions for the human
 
 1.
+
+## 10. FROZEN-BASELINE
+
+> At approval, pin sections 1-5, the evaluation rubric and baseline.json.
+> Never rewrite approved text during the autonomous loop.
+
+- Baseline file SHA-256 / design approval source / date:
+- Frozen sections 1-5 snapshot: `approved_contract.md` / SHA-256:
+- Last human-approved generator commit (rollback anchor):
+- Run manifest input bundle and dependency provenance:
+- Per-project infra worktree / output prefix / shared-budget ownership:
+
+## 11. AUTONOMOUS-DELTA (append-only)
+
+| Date | Observed defect | Change within approved scope | Evidence / commit | Rationale | Ratified at checkpoint |
+| --- | --- | --- | --- | --- | --- |
+
+## 12. HUMAN-DECISIONS (append-only)
+
+| Date | Decision | Exact subject hash / scope | Source | Supersedes |
+| --- | --- | --- | --- | --- |
+
+## 13. Data-value evaluation
+
+- Exact/near-duplicate checks and source lineage:
+- Benchmark/eval contamination checks (keep test answers out of generation):
+- Reviewer calibration set with human labels and disagreement handling:
+- Independent holdout and target-model training/ablation check, or why deferred:
+- At-scale sampling design and uncertainty reporting:

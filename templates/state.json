@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "project_id": "REPLACE_WITH_PROJECT_NAME",
+  "revision": 0,
+  "stage": "context",
+  "cursor": "context",
+  "next_action": "Complete context and design",
+  "stop_reason": null,
+  "rollback_anchor": null,
+  "baseline": null,
+  "design_approval": null,
+  "scale_approval": null,
+  "active_job": null,
+  "review_cursor": null,
+  "history": []
+}

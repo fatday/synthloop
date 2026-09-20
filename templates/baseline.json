@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "target": 0.95,
+  "min_generated": 500,
+  "min_per_cohort": 50,
+  "max_tv_distance": 0.2,
+  "max_cycles": 6,
+  "max_cost_usd": null,
+  "max_wall_seconds": null,
+  "rubric_sha256": null,
+  "contract_sha256": null,
+  "cohorts": {
+    "REPLACE_WITH_COHORT": {"min_accepted": 1, "baseline_share": 1.0}
+  }
+}

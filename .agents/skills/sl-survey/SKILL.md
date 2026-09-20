@@ -1,24 +1,16 @@
 ---
 name: sl-survey
-description: Run synthloop's workspace survey. Use when asked to classify accessible directories, bootstrap or refresh data_projects/ENVIRONMENT.md, find the data-infra repo, or run the `/survey` Claude-equivalent workflow.
+description: Classify synthloop workspace roots and bootstrap or refresh the shared environment catalog.
 ---
 
 # Synthloop Survey
 
-Classify the workspace roots and update shared environment context.
+Read `CLAUDE.md` and `playbook/principles.md`, then follow the **survey**
+workflow in `playbook/workflows.md` and its referenced stage files. Resolve
+these paths from the synthloop repository root, not the generator codebase.
+Use `playbook/runtime.md` for state, evidence and shared executable checks;
+use `playbook/platforms.md` only for platform-specific execution or scheduling.
 
-1. Read `CLAUDE.md`, `playbook/principles.md`, and `playbook/survey.md`.
-2. If `data_projects/` is missing, create it and copy
-   `templates/data_projects_README.md` to `data_projects/README.md`.
-3. If `data_projects/ENVIRONMENT.md` is missing, instantiate it from
-   `templates/environment.md`.
-4. Inspect each accessible root by reading its README, project config, and
-   top-level structure. Classify by evidence, not directory names.
-5. Record path, role, deciding evidence, intended use, and confirmation status
-   in `data_projects/ENVIRONMENT.md`.
-6. Preserve human-confirmed rows; propose changes to them instead of silently
-   rewriting them.
-7. Stop if no accessible directory classifies as `data-infra`; ask the human to
-   grant or identify the generator codebase before design/implementation work.
-
-End by reporting the table and any unknown or low-confidence rows.
+The project name and optional parameters come from the user's request. Resume
+existing state and honor matching recorded authorization. Workflow rules and
+pass criteria are defined in the shared playbook, not in this adapter.

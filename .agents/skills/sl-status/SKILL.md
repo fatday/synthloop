@@ -1,23 +1,16 @@
 ---
 name: sl-status
-description: Show synthloop project or portfolio status. Use when asked for synthloop status, a generator progress dashboard, open human questions, blockers, stale projects, or the `/status` Claude-equivalent workflow.
+description: Read synthloop project or portfolio status, active jobs, blockers and open human questions.
 ---
 
 # Synthloop Status
 
-Run the read-only portfolio status workflow.
+Read `CLAUDE.md` and `playbook/principles.md`, then follow the **status**
+workflow in `playbook/workflows.md` and its referenced stage files. Resolve
+these paths from the synthloop repository root, not the generator codebase.
+Use `playbook/runtime.md` for state, evidence and shared executable checks;
+use `playbook/platforms.md` only for platform-specific execution or scheduling.
 
-1. Read `CLAUDE.md`, then `playbook/principles.md`.
-2. Read `data_projects/ENVIRONMENT.md` if it exists.
-3. If the user named a generator, read `data_projects/<name>/progress.md`,
-   `project_memory.md`, and the latest review summary if referenced.
-4. If no generator is named, read every `data_projects/*/progress.md`.
-5. Print the portfolio table:
-
-   | Generator | Stage | Next action | Blocked on | Last batch verdict |
-
-6. List open human questions prominently.
-7. Flag stale projects whose next action has not changed across sessions, or
-   whose latest ledger entry is old relative to the others.
-
-Do not modify files.
+The project name and optional parameters come from the user's request. Resume
+existing state and honor matching recorded authorization. Workflow rules and
+pass criteria are defined in the shared playbook, not in this adapter.

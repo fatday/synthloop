@@ -7,13 +7,13 @@
 synthloop is not a data generation library. It is the *process* around one: a
 stage-by-stage playbook and fill-in templates that let a coding agent (with a
 human in the loop) take a synthetic-data generator from idea to large-scale
-release, with quality that only moves in one direction.
+release, with explicit quality checks, durable state and auditable human gates.
 
 The playbook is **agent-agnostic** - any coding agent or a human can run it by
 reading `playbook/` - with **first-class Claude Code support** via the slash
 skills in `.claude/skills/` and **first-class Codex support** via repo skills
 in `.agents/skills/`. Pick a track:
-[Claude Code](#path-a-claude-code-recommended),
+[Claude Code](#path-a-claude-code),
 [Codex](#path-b-codex), or
 [any other agent](#path-c-any-other-agent).
 
@@ -37,9 +37,9 @@ The core bets:
 2. **Reading raw rows is the highest-yield QA activity.** Judges and rules
    inherit each other's blind spots; human (and agent) eyes on stratified raw
    samples catch what nothing else does.
-3. **Diagnose, then patch.** Automated repair is allowed only narrow, safe
-   levers (prompts, thresholds, keywords). Code-level fixes require a written
-   diagnosis and a new test.
+3. **Diagnose, then patch.** Autonomous repair can fix prompts, code and
+   constants within the approved surface, without tightening acceptance.
+   Code fixes need a written diagnosis and a test that fails before the fix.
 4. **The ratchet**: every incident becomes a permanent deterministic check.
    Quality cannot regress silently.
 5. **Provenance and telemetry are part of generation, not an afterthought.**
@@ -61,6 +61,9 @@ playbook/
   04_scale.md              Stage 4: scale-up, monitoring, release, postmortem
   principles.md            The distilled rules. Read this first.
   review_rubric.md         How data review is conducted and reported
+  workflows.md             Shared command workflows for both platforms
+  runtime.md               Durable state, evidence, recovery and gate checks
+  platforms.md             Claude Code and Codex execution adapters
 templates/
   environment.md           Workspace-wide context: infra, generator catalog,
                            benchmark targets. Instantiated once per workspace as
@@ -68,14 +71,22 @@ templates/
                            lowercase template -> uppercase instance)
   design_spec.md           Per-generator design spec (with mandatory questions)
   review_instruction.md    Versioned review instructions for QA agents
-  progress.md              Per-generator progress ledger
+  progress.md              Human-readable progress ledger
+  state.json               Machine resume cursor and evidence references
+  baseline.json            Approved coverage, quality and budget settings
+  run_manifest.json        Code/input/model/data provenance
+  review_result.json       Per-row A/B verdicts and review attestations
+  launch_plan.json         Exact scale plan bound to approval
   project_memory.md        Per-generator durable memory (decisions, lessons)
   data_projects_README.md  Seed README copied in when data_projects/ is created
+.claude/agents/            Independent reviewer and refuter definitions
 .claude/skills/            Slash-skills: /survey /design /smoke /review /repair
                            /cycle /scale /status
 .agents/skills/            Codex repo skills: $sl-survey $sl-design
                            $sl-smoke $sl-review $sl-repair
                            $sl-cycle $sl-scale $sl-status
+tools/synthloop.py          Shared offline checker (Python 3.10+, standard library)
+tests/                     Recovery, quality and authorization scenarios
 data_projects/             YOUR workspace state (gitignored here; often its
                            own private repo): one folder per generator
 LICENSE                    MIT
@@ -94,15 +105,16 @@ generator code. Clone them side by side:
 
 The agent's brain is in synthloop (the playbook + skills); its hands are in
 your infra repo (code, tests, generated data). The division of labor never
-changes: **code, tests, and data live in your repo; specs, ledgers, memory,
-and review history live here.** Your code PRs stay clean of process artifacts,
-and the process state survives any session.
+changes: **generator code, tests and data live in your repo; specs, ledgers,
+memory and review history live here.** Shared workflow checks live in tools/;
+they do not implement or launch your generator. Your code PRs stay clean of
+process artifacts, and the process state survives any session.
 
 Then pick a path: **Path A (Claude Code)** for the first-class slash-skill
 flow, **Path B (Codex)** for repo-scoped skills, or **Path C (any other
 agent)** to drive the same loop by reading the playbook.
 
-## Path A: Claude Code (recommended)
+## Path A: Claude Code
 
 Launch Claude Code from synthloop, granting access to your infra repo:
 
@@ -133,7 +145,7 @@ teammate points at their own clones), then launching is just `claude`:
 You can also add a directory to a live session with `/add-dir <path>`.
 
 You do not need to tell the agent what each directory is: `/survey` inspects
-every accessible root and classifies it (data-infra, benchmark, seed-corpus,
+the supplied workspace roots and classifies them (data-infra, benchmark, seed-corpus,
 vendored-reference, ...) with evidence, records the table in
 `data_projects/ENVIRONMENT.md`, and asks you to confirm only the ambiguous
 ones. It runs automatically during `/design`'s first-time bootstrap; re-run
@@ -171,37 +183,40 @@ like reading rows (keep doing that - it is the highest-yield QA there is).
 
 ### Running the inner loop hands-off
 
-Typing `/smoke`, `/review`, `/repair` over and over is the manual part. `/cycle`
-collapses one full iteration into a single command, and `/loop` repeats it for
-you until a stop condition:
+`/cycle` drives the bounded smoke → review → repair loop using the same
+workflow as Codex. Optional `/loop` scheduling can re-invoke it:
 
 ```
-/cycle my-generator             # one iteration: smoke -> review -> safe-fix, then decide
-/loop /cycle my-generator       # auto-repeat cycles until a hard gate (default target: 95%)
-/loop /cycle my-generator 0.9   # custom Track-A accept-rate target
+/cycle my-generator          # drive to two clean passes or a hard stop
+/loop /cycle my-generator    # optional scheduling; terminal stops cancel wakeups
 ```
 
-Each cycle runs the smoke, the dual-track review (with the refutation pass),
-and - **only** for prompt / threshold / keyword-list findings - the repair,
-then loops again. It stops and hands back to you when it should:
+The approved baseline sets the joint pass-rate target (proposed default 95%),
+minimum cohort sample sizes, coverage floors, drift and cycle/cost/time budgets.
+Track A checks ALL emitted rows, including rejects; Track B uses the pinned
+rubric. Two separate 95% rates do not imply 95% joint acceptance. A sampled
+semantic review cannot silently count unreviewed rows as good.
 
-- target hit (default 95% accept-rate, no critical findings) -> stops and parks
-  for your review (it never auto-`/scale`s; the stage-3 gate is yours on return),
-- any finding that needs a **code** fix -> human-supervised `/repair`,
-- oscillation (a metric flips twice) or a 6-cycle safety cap.
+A tiny functional smoke checks directed paths, not population frequencies.
+Validation uses the approved sample sizes. Ordinary random coverage fluctuation
+is not automatically a regression; evaluate frozen floors, drift and paired replay.
 
-So the loop is automated only where the playbook allows automation: it never
-edits generator code on its own and never crosses a human gate.
+The first clean pass triggers a new-seed confirmation batch on the same validated
+version. Two consecutive clean passes stop for human review of the exact scale
+plan. Any edited/failed cycle breaks the streak. Hard gates, confirmed regression,
+unreconciled infrastructure failures and budget limits stop earlier. Net-tightening
+acceptance, weakening judges/ratchets, changing frozen baselines and expanding
+scope remain human-gated. The loop never auto-scales.
 
 ### Day to day
 
 - **Resume anything**: new session -> `/status` -> pick a project -> the agent
-  reads its `progress.md` "Next action" line and continues. No re-explaining
-  context from chat history.
-- **Several generators at once**: one Claude session per generator, launched
-  the same way. Projects coordinate only through their own folders, so
-  parallel sessions never collide. Lessons that generalize get promoted to
-  `playbook/`, and every in-flight generator inherits them immediately.
+  reads state.json and runs the resume helper. Active jobs are reconciled and
+  incomplete reviews resume from their saved chunks. progress.md is the summary.
+- **Several generators at once**: one session, infra worktree and output prefix
+  per generator, with a single writer per project. Serialize shared environment
+  and playbook updates; project folders alone do not isolate a shared infra HEAD.
+  Pin the framework version in each run manifest.
 - **Teammates**: clone both repos, run the same two commands, inherit
   everything - the environment file, the playbook, and each project's state.
 
@@ -212,7 +227,7 @@ same workspace/session:
 
 ```bash
 cd ~/work/synthloop
-codex
+codex --add-dir ~/work/my-data-infra
 ```
 
 Codex reads `AGENTS.md` automatically and discovers repo skills from
@@ -253,7 +268,8 @@ $sl-status                  # portfolio dashboard
 
 Everything else is the same contract as Claude Code: `CLAUDE.md` is canonical,
 `playbook/` is the source of truth, human gates are hard gates, and every
-session writes back to `progress.md`.
+session persists state.json and its progress.md summary. See
+[platform adapters](playbook/platforms.md) for independent review and automation.
 
 ## Path C: any other agent
 
@@ -279,16 +295,18 @@ harness):
    `03_quality_loop.md`, `04_scale.md`) and following its checklist and exit
    criteria - the same two human gates apply.
 
-Nothing in `playbook/` or `templates/` depends on Claude Code. The skills just
-save you from naming the file each time.
+The core stage rules and templates are platform-neutral. Both skill sets route
+to [shared workflows](playbook/workflows.md); platform-specific execution details
+live separately in [platforms.md](playbook/platforms.md).
 
 ## Public framework, private state
 
 This repo is the FRAMEWORK only. Everything workspace-specific - your
 instantiated `ENVIRONMENT.md`, your project folders, your operational
 scripts - lives under `data_projects/`, which is **gitignored here by
-design**. Your internal infra details can never end up in the open-source
-project, even with a careless `git add .`.
+design**. Ordinary `git add .` excludes that directory; keep private details
+out of tracked templates/playbook files too. Gitignore is not a privacy boundary
+against force-adds or copying internal content into public files.
 
 (That is also why you will not see a `data_projects/` folder on the hosted
 repo: it does not exist until first use. `/design` creates it locally, and
@@ -308,6 +326,35 @@ git clone git@your-host:your-org/synthloop-projects.git data_projects
 With option 2, agents commit process state (progress ledgers, specs, memory)
 to the private repo as they work, teammates clone the same pair of repos,
 and the public framework stays clean.
+
+## Shared offline checks
+
+Python 3.10+ is the only runtime dependency. After bootstrap, the agent uses:
+
+```bash
+python3 tools/synthloop.py validate-state data_projects/my-generator
+python3 tools/synthloop.py resume data_projects/my-generator
+python3 tools/synthloop.py check-batch data_projects/my-generator --manifest /path/to/run_manifest.json --review /path/to/review_result.json
+python3 tools/synthloop.py check-gates data_projects/my-generator --plan /path/to/launch_plan.json --infra /path/to/infra-worktree
+```
+
+[The runtime contract](playbook/runtime.md) documents state updates, immutable
+artifacts, duplicate-batch protection, recorded approvals, budget accounting and
+migration for existing projects. Checks never submit a job or publish data.
+A matching recorded authorization remains valid when you change sessions.
+Launchers enforce live budgets; the offline helper checks reported evidence and
+cannot replace independent review or prove that an approval source is authentic.
+
+Run the repository's offline acceptance scenarios:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+The suite exercises interruption/resume, review chunk recovery, joint-rate and
+cohort gates, stale/concurrent writes, provenance drift and plan-bound approval.
+It makes no model calls. Live Claude Code/Codex behavior checks are a separate
+step described in platforms.md.
 
 ## The human's job
 

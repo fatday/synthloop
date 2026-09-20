@@ -2,7 +2,9 @@
 
 > Versioned: copy to `review_instructions/v<N+1>.md` when reviewer behavior
 > should change (new failure class found, new capability added). Reviewers
-> always use the latest version; the version used is recorded per batch.
+> use the evaluation version pinned in the approved baseline for pass/fail.
+> New versions are candidates for shadow review until adopted at a human
+> checkpoint. Record evaluation and candidate versions separately per batch.
 
 ## What this data is
 

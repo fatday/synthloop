@@ -19,10 +19,15 @@ write back what they learn so the next generator starts smarter.
 ```
 data_projects/<name>/
   design_spec.md             The contract (coverage numbers, reality checks)
-  progress.md                Resume point: stage, next action, ledgers, gates
+  progress.md                Human summary: stage, next action, ledgers, gates
+  state.json                 Machine cursor, job/review handles, approval refs
+  baseline.json              Frozen thresholds, cohort floors, budgets, rubric
+  approved_contract.md       Frozen goals, non-goals, schema and quality contract
+  runs/<batch-id>/            Immutable manifest/review and input snapshots
+  launch_plan.json            Exact scale plan bound to human approval
   project_memory.md          Decisions, diagnoses, lessons (newest first)
   review_instructions/
-    v1.md, v2.md, ...        Versioned reviewer guidance; latest wins
+    v1.md, v2.md, ...        Pinned evaluation version; candidates run in shadow
   reviews/                   Batch review summaries (one file per batch)
   patches/                   Optional: written diagnoses for non-trivial fixes
   scripts/                   Operational scripts owned by this project:
@@ -45,7 +50,8 @@ folders.
   would be noise in an infra PR.
 - **Nowhere in synthloop**: generated DATA. Outputs stay in the infra's data
   dirs or your storage; this repo holds counts, verdicts, and pointers, never
-  rows (size, and privacy if this repo is shared).
+  full raw datasets (size and privacy). Private review summaries may contain
+  the verbatim evidence required by the rubric; keep them in data_projects/.
 
 Scripts in `scripts/` typically run against the infra repo's environment;
 invoke them through it (e.g. the infra's venv or `uv run --project <infra>`),
@@ -59,10 +65,11 @@ nobody guesses.
 - **One session, one project**: a working session scopes to a single
   generator unless it is explicitly a portfolio pass (`/status`). Parallel
   work on different generators belongs in parallel sessions; the per-project
-  `progress.md` files are the coordination points, so sessions never need
-  shared state beyond them.
+  state files are coordination points. Use a separate infra worktree and output
+  prefix per project, one project writer, and serialized shared-file updates;
+  see playbook/runtime.md. Separate project folders alone do not isolate HEAD.
 - `progress.md` is append-only below the header; any agent or person resumes
-  from its "Next action" line.
+  using state.json and the runtime resume check, with the header as its summary.
 - Lessons that generalize beyond one generator get promoted from
   `project_memory.md` to `playbook/principles.md` in the same change, so
   every other in-flight generator inherits them immediately.

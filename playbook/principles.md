@@ -74,8 +74,9 @@ every batch and alert on drift. Two corollaries learned the hard way:
 - A new capability (tool, branch, behavior) does not get exercised just
   because it exists. It needs explicit demand-side wiring (steering the
   task/user simulator toward it) or it ships dark.
-- "Did it actually fire?" is checked on the FIRST run with a usage counter,
-  never retroactively via someone noticing a dashboard at zero.
+- "Did it actually fire?" is checked with directed cases on the first smoke
+  and usage counters thereafter. Distribution checks require approved minimum
+  sample sizes; absence in a tiny random sample is not proof of a broken path.
 
 ## 6. Adversarial verification of review findings
 
@@ -90,7 +91,9 @@ itself manufactures false findings).
 
 Every batch of generated data must be traceable to the exact code that
 produced it. Commit (a WIP commit is fine) before every launch, smoke or
-scale, and stamp rows or batch metadata with the commit hash. Mid-run hotfixes
+scale, verify the worktree is clean, and stamp rows/batch metadata with the hash.
+Also pin framework, config, prompts, rubric, launch scripts, dependencies,
+model, seed and retained data hashes (see `runtime.md`). Mid-run hotfixes
 create mixed-generation corpora; record the cutover timestamp so batches can
 be split later. The question "which code wrote these rows" must always be
 answerable.
