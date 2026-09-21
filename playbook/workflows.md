@@ -43,7 +43,8 @@ failure.
 Follow `03_quality_loop.md` 3.2-3.3 and `review_rubric.md`. Review the specified
 batch, never silently substitute another. Check its provenance, full emitted
 row set and pinned rubric. Resume incomplete review chunks. Use independent
-reviewer and refuter contexts per `platforms.md`, retaining full evidence. Report A, B and
+reviewer and refuter contexts per `platforms.md`, honoring the optional review
+backend in `ENVIRONMENT.md` and retaining full evidence. Report A, B and
 joint rates with denominators and cohort sample sizes. Sampled B is explicitly
 incomplete for the validation gate. Write one review summary with the verdict
 and supporting evidence, then record it in progress.md. Do not relax the rubric

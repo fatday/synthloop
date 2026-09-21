@@ -292,6 +292,12 @@ The core stage rules and templates are platform-neutral. Both skill sets route
 to [shared workflows](playbook/workflows.md); platform-specific execution details
 live separately in [platforms.md](playbook/platforms.md).
 
+Reviewers can optionally use a user-provided model API while retaining the
+Codex or Claude Code harness. Record the selection in your workspace's
+`ENVIRONMENT.md`; see [review backends](playbook/review_backends.md) for setup,
+protocol requirements, and the distinction between native subagents and CLI
+worker sessions. The default remains the host's native agents.
+
 ## Public framework, private state
 
 This repo is the FRAMEWORK only. Everything workspace-specific - your

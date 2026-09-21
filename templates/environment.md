@@ -73,3 +73,17 @@
 > (e.g. "judge model X inflates scores on long conversations").
 
 -
+
+## 6. Review backend (optional)
+
+Omit this section to use the host's native reviewer/refuter. These are instructions
+for the coordinating agent, not a machine-parsed config. See
+`playbook/review_backends.md` for native harness setup and API compatibility.
+
+- **Mode**: native (default) / custom-api
+- **Harness for custom-api**: codex / claude-code
+- **Model and API base URL**: <user-selected model and endpoint>
+- **Credential environment variable**: <variable name only; never the key>
+- **Local binding**: <configured Codex agent name or CLI launch settings>
+- **Refuter override**: <optional separate backend; otherwise use the same backend
+  in a fresh context>
