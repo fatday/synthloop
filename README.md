@@ -1,5 +1,7 @@
 # synthloop
 
+**English** | [简体中文](README.zh-CN.md)
+
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/b84fdbea-c99a-419a-ac46-51603c1507c7" />
 
 **An agentic playbook for building, reviewing, and iterating LLM data generators.**
@@ -60,7 +62,8 @@ playbook/
   03_quality_loop.md       Stage 3: the small-scale generate/QA/repair loop
   04_scale.md              Stage 4: scale-up, monitoring, release, postmortem
   principles.md            The distilled rules. Read this first.
-  review_rubric.md         How data review is conducted and reported
+  review_rubric.md          How data review is conducted and reported
+  review_backends.md        Optional review APIs using native agent harnesses
   workflows.md             Shared command workflows for both platforms
   recovery.md              Session recovery, records and parallel coordination
   platforms.md             Claude Code and Codex execution adapters
