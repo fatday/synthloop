@@ -24,9 +24,8 @@ If these tools are unavailable, use one bounded invocation and report the limit.
 
 Do not mark cycle or its nested workers explicit-only: that would block scheduled
 skill invocation in supported Claude Code versions. Scale remains discoverable,
-but the actual launch requires the shared plan-bound authorization check.
-Optional PreToolUse hooks may call shared preflight checks; they supplement the
-launcher contract and do not replace it or protect arbitrary shell side effects.
+but the agent must verify that the actual launch is covered by the recorded
+human authorization, following the shared scale workflow.
 
 ## Codex
 
@@ -35,12 +34,9 @@ the same operating guide. Invoke `$sl-design`, `$sl-smoke`, `$sl-review`,
 `$sl-repair`, `$sl-cycle`, `$sl-scale`, `$sl-survey`, or `$sl-status`.
 
 Use an available independent agent context for reviewer/refuter roles with the
-same inputs and read-only intent. When building a scripted coordinator, Codex
-supports `codex exec --sandbox read-only --json` for event capture and
-`--output-schema <schema-file>` for structured final output. Keep provider event
-streams separate from synthloop's finalized review_result.json; map and validate
-the result before recording it. Explicitly bind any resumed session ID to the
-project/batch/role; do not use a global `--last` in parallel projects.
+same inputs and read-only intent. Supply full rows and the pinned rubric, then
+save findings in the project's review report. Bind resumed sessions to the right
+project/batch/role; avoid resuming an unrelated session in parallel work.
 
 When independent execution is unavailable, report that missing review evidence
 and stop before a pass checkpoint; a self-review is not an independent refutation.
@@ -48,19 +44,17 @@ Persist the shared cursor between invocations. A shell runner or task scheduler
 can re-invoke a bounded cycle, but must stop on persisted terminal state and
 reconcile jobs before retries. No Claude-only `/loop` command is required.
 
-## Compatibility checks
+## Improving the adapters
 
-After changing either adapter, run offline tests and the skill frontmatter
-validator. Before claiming live platform compatibility, also run a small private
-fixture through each actual CLI: interrupt after submission and after one review
-chunk; resume; verify no duplicate job/chunk, identical shared metrics, and no
-scale launch without a matching approval. These live checks consume model calls
-and are separate from the repository's standard-library test suite.
+Use an actual small generator workflow to assess an adapter change: inspect
+whether the agent follows the intended stage, catches real defects, resumes
+unfinished work and avoids duplicate launches. Record observed failures and
+adjust the relevant instructions. Do not claim live compatibility from reading
+instructions alone.
 
 Official references: [Claude skills](https://code.claude.com/docs/en/skills),
 [subagents](https://code.claude.com/docs/en/sub-agents),
 [scheduling](https://code.claude.com/docs/en/scheduled-tasks),
-[hooks](https://code.claude.com/docs/en/hooks),
 [Codex skills](https://developers.openai.com/codex/skills),
 [CLI](https://developers.openai.com/codex/cli/reference), and
 [non-interactive mode](https://developers.openai.com/codex/noninteractive).

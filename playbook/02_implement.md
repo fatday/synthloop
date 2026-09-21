@@ -17,13 +17,13 @@ extras; they ARE the iteration speed.
       counters named in the design spec's Reality Checks.
 - [ ] **Provenance stamps**: rows or batch metadata carry the code commit and
       a batch identifier.
-- [ ] **Durable execution**: implement the runtime.md contract in the project
-      runbook: pre-submit batch key, scheduler reconciliation, immutable full-row
-      inventory (including rejects), input/data hashes and resumable review
-      chunks. Keep the generator worktree separate from other active projects.
+- [ ] **Resumable work**: record batch/job IDs, output locations and review
+      progress in progress.md, using the infra's existing metadata and commands.
+      Retain rejected rows. Keep the generator worktree separate from other
+      active projects; see recovery.md.
 - [ ] **Limits**: enforce the approved row/cost/time bounds in launch wrappers;
-      track in-flight spend, failed attempts and retries. The offline checker
-      does not terminate live jobs or account for calls it cannot observe.
+      track in-flight spend, failed attempts and retries through the infra's
+      telemetry and provider usage records.
 - [ ] **Unit tests for the seams**: schema rendering/validation, the
       deterministic twins (same seed, same output), parser round-trips, and
       any scoring/ranking logic (testable offline by construction).
@@ -34,9 +34,6 @@ extras; they ARE the iteration speed.
       records how.
 - [ ] **Runbook**: the exact commands to smoke-generate, count rows, tally
       coverage, and run the test suite, written into `progress.md`.
-- [ ] **Recovery drill**: interrupt an offline run after submission and after
-      one review chunk; recover using state without duplicate generation or
-      review. A full live model call is not necessary for this drill.
 
 ## Output
 

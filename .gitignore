@@ -6,7 +6,3 @@ data_projects/
 
 # Personal Claude Code settings (per-user paths)
 .claude/settings.local.json
-
-# Local Python verification artifacts
-__pycache__/
-*.pyc

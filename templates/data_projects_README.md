@@ -19,12 +19,7 @@ write back what they learn so the next generator starts smarter.
 ```
 data_projects/<name>/
   design_spec.md             The contract (coverage numbers, reality checks)
-  progress.md                Human summary: stage, next action, ledgers, gates
-  state.json                 Machine cursor, job/review handles, approval refs
-  baseline.json              Frozen thresholds, cohort floors, budgets, rubric
-  approved_contract.md       Frozen goals, non-goals, schema and quality contract
-  runs/<batch-id>/            Immutable manifest/review and input snapshots
-  launch_plan.json            Exact scale plan bound to human approval
+  progress.md                Resume point: stage, ongoing work, ledgers, gates
   project_memory.md          Decisions, diagnoses, lessons (newest first)
   review_instructions/
     v1.md, v2.md, ...        Pinned evaluation version; candidates run in shadow
@@ -65,11 +60,11 @@ nobody guesses.
 - **One session, one project**: a working session scopes to a single
   generator unless it is explicitly a portfolio pass (`/status`). Parallel
   work on different generators belongs in parallel sessions; the per-project
-  state files are coordination points. Use a separate infra worktree and output
+  progress ledgers are coordination points. Use a separate infra worktree and output
   prefix per project, one project writer, and serialized shared-file updates;
-  see playbook/runtime.md. Separate project folders alone do not isolate HEAD.
+  see playbook/recovery.md. Separate project folders alone do not isolate HEAD.
 - `progress.md` is append-only below the header; any agent or person resumes
-  using state.json and the runtime resume check, with the header as its summary.
+  by reading its current state and reconciling referenced jobs and outputs.
 - Lessons that generalize beyond one generator get promoted from
   `project_memory.md` to `playbook/principles.md` in the same change, so
   every other in-flight generator inherits them immediately.

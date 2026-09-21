@@ -27,8 +27,8 @@ generator unless explicitly doing a portfolio pass.
 2. **Read before acting.** On any task, read `data_projects/ENVIRONMENT.md`
    (shared infra, generator catalog, benchmark targets - instantiate it from
    `templates/environment.md` if missing), then the project's `progress.md`
-   (human summary), `state.json` (machine resume cursor), and `project_memory.md`
-   (decisions and lessons). Use `playbook/runtime.md` to reconcile active jobs
+   (current stage, ongoing work and next action) and `project_memory.md`
+   (decisions and lessons). Use `playbook/recovery.md` to reconcile active jobs
    and incomplete reviews before launching anything. Framework discussion and
    maintenance do not require creating generator workspace state.
 3. **Stages are entered through skills (Claude Code) or by reading the
@@ -37,9 +37,9 @@ generator unless explicitly doing a portfolio pass.
    `playbook/`; without them, open the matching `playbook/` file yourself
    (see `AGENTS.md` for the mapping). Either way, follow the checklist; the
    exit criteria are not optional.
-4. **Write back before ending.** Generator work persists `state.json` at
-   sub-stage transitions and updates `progress.md` (what happened, current stage,
-   the single next action) before ending. If a decision or lesson was made,
+4. **Write back before ending.** Update `progress.md` at meaningful stage
+   transitions and before ending (what happened, ongoing jobs/reviews, current
+   stage and the single next action). If a decision or lesson was made,
    update `project_memory.md` too. Read-only status and framework maintenance
    do not write generator state. If `data_projects/`
    is its own git repo, commit your state updates there (`git -C

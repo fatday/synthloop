@@ -16,8 +16,7 @@ drift from; `CLAUDE.md` is canonical.
 ## Stages live in `playbook/`
 
 The work is a five-stage loop, preceded by a one-time workspace survey. Each
-file defines a checklist with exit criteria. Shared offline helpers in `tools/`
-validate persisted state, batch evidence and scale gates:
+file defines a checklist with exit criteria for the agent to follow directly:
 
 - `playbook/survey.md` - classify workspace directories (run once / on change)
 - `playbook/00_context.md` - learn the domain and target
@@ -28,12 +27,12 @@ validate persisted state, batch evidence and scale gates:
 - `playbook/principles.md` - the distilled rules (read first)
 - `playbook/review_rubric.md` - how review is conducted and reported
 - `playbook/workflows.md` - common command workflows for both skill adapters
-- `playbook/runtime.md` - state, manifests, recovery and executable checks
+- `playbook/recovery.md` - session recovery, records and parallel coordination
 - `playbook/platforms.md` - Claude Code and Codex integration details
 
 Per-generator state lives under `data_projects/<name>/`, instantiated from
-`templates/`. Read state.json, progress.md and project_memory.md; run the
-shared resume helper before continuing an active project.
+`templates/`. Read progress.md and project_memory.md, then reconcile referenced
+jobs and outputs before continuing an active project (see `playbook/recovery.md`).
 
 ## Agent-specific shortcuts are optional conveniences
 

@@ -1,8 +1,8 @@
 # Progress: <generator name>
 
-> Human summary of state.json, the machine-readable resume point. Keep the
-> header current; append ledger entries; never rewrite history. Run the shared
-> resume check before starting an external job.
+> The resume point for any agent or human. Keep the header current; append
+> ledger entries; never rewrite history. Reconcile referenced jobs and outputs
+> before starting another run.
 
 ## Current state
 
@@ -10,10 +10,10 @@
 - **Next action** (one line, concrete):
 - **Blocked on** (if anything):
 - **Open questions for the human**:
-- **State revision / sub-stage cursor**:
+- **Current sub-stage**:
 - **Active batch / scheduler handle / output location**:
 - **Review chunks completed / remaining**:
-- **Clean-pass streak / validated fingerprint**:
+- **Consecutive clean passes / code and input versions**:
 - **Stop reason / cycle, cost and time consumed**:
 - **Rollback anchor / current HEAD / autonomous commits**:
 
@@ -26,15 +26,14 @@
 - Coverage tally:
 - Tests:
 - Launch (scale):
-- Validate state / resume / batch / scale gate:
 - Reconcile a submitted job by batch/idempotency key:
 - Cancel platform schedule (handle and command/tool):
 - Live cost/time limits and in-flight/failed-attempt accounting:
 
 ## Gates
 
-- Design approved by human: <date / source / baseline SHA-256>
-- Scale approved by human: <date / source / exact launch-plan SHA-256>
+- Design approved by human: <date / source / approved spec and rubric versions>
+- Scale approved by human: <date / source / approved launch command, volume and budget>
 - Publication authorized: <date / source / release scope>
 - Unratified design deltas:
 
@@ -42,7 +41,7 @@
 
 > One row per generation batch, append-only.
 
-| Batch id | Date | Purpose | Manifest / review | Generated / B-reviewed | Joint rate | Coverage / drift | Verdict / action |
+| Batch id | Date | Purpose | Commit / config / review | Generated / B-reviewed | Joint rate | Coverage / drift | Verdict / action |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 
 ## Session ledger

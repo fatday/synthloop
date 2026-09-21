@@ -15,9 +15,10 @@ implementation surprises mean the spec was incomplete.
 - [ ] **Behavior coverage spec** (REQUIRED): the target distribution as
       numbers - task categories with weights, turn-type mix, difficulty mix,
       expected per-capability usage floor. This is what QA measures against.
-- [ ] **Executable baseline**: instantiate baseline.json with mutually exclusive
-      cohorts, joint-rate target, accepted-count floors, minimum sample sizes,
-      accepted-share baseline, drift and cycle/cost/time budgets. Include
+- [ ] **Validation baseline**: record cohort definitions, joint-rate target,
+      accepted-count floors, minimum sample sizes, accepted-share baseline,
+      drift and cycle/cost/time budgets in the design spec. State whether
+      cohorts overlap; do not sum overlapping shares as a probability distribution. Include
       directed functional tests for rare capabilities; distinguish random
       distribution estimates from path reachability tests.
 - [ ] **Demand-side wiring**: for every capability in the coverage spec, what
@@ -61,10 +62,10 @@ implementation surprises mean the spec was incomplete.
 - A human has read the spec and answered the open questions.
 - The coverage spec has numbers, the Reality Checks have answers, and the
   schema has a worked example.
-- Explicit human approval recorded against baseline.json's hash in state.json
-  and summarized in progress.md. Pin the evaluation rubric and approved contract
-  SHA-256 (export sections 1-5 as approved_contract.md). New rubric
-  candidates run in shadow until an authorized checkpoint; see runtime.md.
+- Explicit human approval recorded in progress.md with source, date and the
+  approved design/rubric versions. Keep the approved baseline identifiable in
+  the design spec. New rubric candidates run in shadow until an authorized
+  checkpoint adopts them.
 
 ## Common failure modes
 

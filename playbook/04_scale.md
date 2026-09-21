@@ -6,13 +6,15 @@ end at launch; it ends at a postmortem that updates the playbook.
 
 ## Preflight (before the launch command)
 
-- [ ] Finish the exact launch_plan.json before asking for approval. Verify two
-      consecutive clean validation passes on the same fingerprint with distinct
-      seeds, ratified design deltas, and recorded design/scale authorizations.
+- [ ] Record the concrete launch command, volume, budget and failure policy in
+      the runbook before asking for approval. Verify two consecutive clean passes
+      with distinct seeds and matching code/config/model/rubric/baseline,
+      ratified design deltas, and recorded design/scale authorizations.
       Existing plan-bound approval survives a new session; do not ask again
       solely because the approval was in another conversation.
-- [ ] Run the shared `check-gates` command from runtime.md immediately before
-      launch. Changed code, live inputs or plan invalidate the old check.
+- [ ] Immediately before launch, compare the actual code, inputs and command
+      with the validated version and approved plan. Resolve material changes
+      before proceeding; see recovery.md.
 - [ ] Reserve an idempotency key and reconcile prior job state before submitting;
       bind live row/cost/time limits and bounded retries to the approved plan.
 - [ ] Code committed; commit hash recorded in `progress.md` next to the

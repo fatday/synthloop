@@ -62,7 +62,7 @@ playbook/
   principles.md            The distilled rules. Read this first.
   review_rubric.md         How data review is conducted and reported
   workflows.md             Shared command workflows for both platforms
-  runtime.md               Durable state, evidence, recovery and gate checks
+  recovery.md              Session recovery, records and parallel coordination
   platforms.md             Claude Code and Codex execution adapters
 templates/
   environment.md           Workspace-wide context: infra, generator catalog,
@@ -72,11 +72,6 @@ templates/
   design_spec.md           Per-generator design spec (with mandatory questions)
   review_instruction.md    Versioned review instructions for QA agents
   progress.md              Human-readable progress ledger
-  state.json               Machine resume cursor and evidence references
-  baseline.json            Approved coverage, quality and budget settings
-  run_manifest.json        Code/input/model/data provenance
-  review_result.json       Per-row A/B verdicts and review attestations
-  launch_plan.json         Exact scale plan bound to approval
   project_memory.md        Per-generator durable memory (decisions, lessons)
   data_projects_README.md  Seed README copied in when data_projects/ is created
 .claude/agents/            Independent reviewer and refuter definitions
@@ -85,8 +80,6 @@ templates/
 .agents/skills/            Codex repo skills: $sl-survey $sl-design
                            $sl-smoke $sl-review $sl-repair
                            $sl-cycle $sl-scale $sl-status
-tools/synthloop.py          Shared offline checker (Python 3.10+, standard library)
-tests/                     Recovery, quality and authorization scenarios
 data_projects/             YOUR workspace state (gitignored here; often its
                            own private repo): one folder per generator
 LICENSE                    MIT
@@ -106,9 +99,9 @@ generator code. Clone them side by side:
 The agent's brain is in synthloop (the playbook + skills); its hands are in
 your infra repo (code, tests, generated data). The division of labor never
 changes: **generator code, tests and data live in your repo; specs, ledgers,
-memory and review history live here.** Shared workflow checks live in tools/;
-they do not implement or launch your generator. Your code PRs stay clean of
-process artifacts, and the process state survives any session.
+memory and review history live here.** The agent runs the playbook using your
+existing infra. Your code PRs stay clean of process artifacts, and the progress
+ledger lets another session continue the work.
 
 Then pick a path: **Path A (Claude Code)** for the first-class slash-skill
 flow, **Path B (Codex)** for repo-scoped skills, or **Path C (any other
@@ -211,12 +204,12 @@ scope remain human-gated. The loop never auto-scales.
 ### Day to day
 
 - **Resume anything**: new session -> `/status` -> pick a project -> the agent
-  reads state.json and runs the resume helper. Active jobs are reconciled and
-  incomplete reviews resume from their saved chunks. progress.md is the summary.
+  reads progress.md and checks referenced jobs and outputs. Active jobs are
+  reconciled and incomplete reviews resume from their saved chunks.
 - **Several generators at once**: one session, infra worktree and output prefix
   per generator, with a single writer per project. Serialize shared environment
   and playbook updates; project folders alone do not isolate a shared infra HEAD.
-  Pin the framework version in each run manifest.
+  Record the framework version alongside batch metadata.
 - **Teammates**: clone both repos, run the same two commands, inherit
   everything - the environment file, the playbook, and each project's state.
 
@@ -268,7 +261,7 @@ $sl-status                  # portfolio dashboard
 
 Everything else is the same contract as Claude Code: `CLAUDE.md` is canonical,
 `playbook/` is the source of truth, human gates are hard gates, and every
-session persists state.json and its progress.md summary. See
+session updates progress.md. See
 [platform adapters](playbook/platforms.md) for independent review and automation.
 
 ## Path C: any other agent
@@ -327,34 +320,13 @@ With option 2, agents commit process state (progress ledgers, specs, memory)
 to the private repo as they work, teammates clone the same pair of repos,
 and the public framework stays clean.
 
-## Shared offline checks
+## Continuing work
 
-Python 3.10+ is the only runtime dependency. After bootstrap, the agent uses:
-
-```bash
-python3 tools/synthloop.py validate-state data_projects/my-generator
-python3 tools/synthloop.py resume data_projects/my-generator
-python3 tools/synthloop.py check-batch data_projects/my-generator --manifest /path/to/run_manifest.json --review /path/to/review_result.json
-python3 tools/synthloop.py check-gates data_projects/my-generator --plan /path/to/launch_plan.json --infra /path/to/infra-worktree
-```
-
-[The runtime contract](playbook/runtime.md) documents state updates, immutable
-artifacts, duplicate-batch protection, recorded approvals, budget accounting and
-migration for existing projects. Checks never submit a job or publish data.
-A matching recorded authorization remains valid when you change sessions.
-Launchers enforce live budgets; the offline helper checks reported evidence and
-cannot replace independent review or prove that an approval source is authentic.
-
-Run the repository's offline acceptance scenarios:
-
-```bash
-python3 -m unittest discover -s tests -v
-```
-
-The suite exercises interruption/resume, review chunk recovery, joint-rate and
-cohort gates, stale/concurrent writes, provenance drift and plan-bound approval.
-It makes no model calls. Live Claude Code/Codex behavior checks are a separate
-step described in platforms.md.
+The agent follows the playbook directly using the existing infra's commands and
+records. Keep ongoing jobs, review progress, batch results and the next action
+in progress.md. [Recovery guidance](playbook/recovery.md) explains how to resume
+without duplicating work and how to reuse matching authorization across sessions.
+No framework runtime, required JSON state files or framework test suite is needed.
 
 ## The human's job
 

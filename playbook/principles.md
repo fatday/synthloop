@@ -92,8 +92,9 @@ itself manufactures false findings).
 Every batch of generated data must be traceable to the exact code that
 produced it. Commit (a WIP commit is fine) before every launch, smoke or
 scale, verify the worktree is clean, and stamp rows/batch metadata with the hash.
-Also pin framework, config, prompts, rubric, launch scripts, dependencies,
-model, seed and retained data hashes (see `runtime.md`). Mid-run hotfixes
+Also record framework, config, prompt, rubric, launch-script and dependency
+versions, model and seed, using the infra's metadata or progress.md. Keep mutable
+inputs reproducible through versioned files or snapshots (see `recovery.md`). Mid-run hotfixes
 create mixed-generation corpora; record the cutover timestamp so batches can
 be split later. The question "which code wrote these rows" must always be
 answerable.

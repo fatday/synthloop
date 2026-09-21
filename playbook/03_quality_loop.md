@@ -9,13 +9,13 @@ hours, the missing piece is almost always offline replayability (stage 2).
 
 ## 3.1 Small-scale generation
 
-- Read `state.json` and run the resume procedure in `runtime.md` before launch.
+- Read `progress.md` and follow `recovery.md` before launch.
   Reconcile active jobs and incomplete reviews; never blindly regenerate.
 - **Functional smoke**: 20-50 rows, with directed cases for every designed
   capability. This checks crashes, format and reachable paths; it is not a
   distribution estimate and cannot count as a clean validation pass.
 - **Validation batch**: use the approved minimum total and per-cohort sample
-  sizes, coverage floors, target and drift budget from `baseline.json`.
+  sizes, coverage floors, target and drift budget from the approved design spec.
   Typically 500-5000 rows; rare capabilities need more observations or directed
   tests. Under independent sampling, a 1% capability is absent in 50 rows about
   61% of the time. Zero observations in an undersized random sample means
@@ -24,8 +24,8 @@ hours, the missing piece is almost always offline replayability (stage 2).
 - Reserve batch/job identity before submission. Retain the full raw batch and
   generated-row inventory BEFORE filtering, including rejected rows. Record
   failed attempts, retries and spend separately.
-- Pin the code, framework, model and input hashes using run_manifest.json;
-  persist job handles/cursors in state and a short summary in progress.md.
+- Record code/framework commits, model, seed and input versions in the batch
+  metadata or progress.md. Keep job handles and review progress there too.
 
 ## 3.2 Automated QA (dual-track, every cycle)
 
@@ -73,7 +73,7 @@ B_pass/B_reviewed, reviewed sample size, and (for full review) joint_pass/N.
 A and B each passing 95% is not enough: disjoint failures can leave joint pass
 at 90%. Unreviewed B rows are unknown, never assumed good. At-scale sampled
 reviews report the approved sampling estimator and uncertainty separately;
-they do not count as full-validation passes in the shared helper.
+they do not establish a full-batch validation pass.
 
 A clean validation pass requires all of:
 - Full Track-A and Track-B review, with **joint_pass/N >= target**, AND
@@ -86,12 +86,12 @@ A clean validation pass requires all of:
 - no code/config/prompt/design edit during the cycle; the rows match current
   committed code and pinned inputs.
 
-Use `tools/synthloop.py check-batch` and `record-review` per `runtime.md`.
-The first clean pass transitions to **pass_1** and schedules an independent
-confirmation batch (new seed, same code/config/rubric/model/baseline). The second
-consecutive clean pass transitions to **ready_for_approval** and stops for human
-review. A failed/edited cycle resets the streak; a changed fingerprint starts a
-new streak. Duplicate batches or repeated seeds cannot satisfy two passes.
+Record the verdict and evidence in the review summary and progress.md.
+The first clean pass requests an independent confirmation batch (new seed, same
+code/config/rubric/model/baseline). The second
+consecutive clean pass stops for human review. A failed/edited cycle resets the
+streak; changes to code, behavior config, model, rubric or baseline require
+fresh validation. Duplicate batches or repeated seeds cannot satisfy two passes.
 Human approval is bound to the concrete scale plan, not just a generic pass.
 Never auto-scale.
 
@@ -145,8 +145,8 @@ Then loop to 3.1.
 ## 3.5 Autonomous-loop guard rails (the basis for safe autonomy)
 
 The loop may fix code, constants, and tune minor design without a human inside
-these constraints. Verify the evidence with the shared helper and independent
-review; written invariants alone do not enforce themselves.
+these constraints. The agent checks actual outputs and review evidence before
+marking a cycle passed; a checklist completed without evidence is insufficient.
 
 1. **Frozen baseline.** Approved spec sections (goals/non-goals, schema,
    coverage categories + floors), the coverage histogram, and the target floor
@@ -187,7 +187,7 @@ after checking the existing job identity. Monitor in-flight spend too.
 Every stop records the reason, current HEAD, rollback anchor, autonomous commits,
 coverage/joint-rate deltas and one next action. Cancel the actual scheduled
 wakeup/job when using a platform loop; a Markdown next-action change is not
-cancellation. Follow `platforms.md` and `runtime.md`. Completion at the second
+cancellation. Follow `platforms.md` and `recovery.md`. Completion at the second
 clean pass still requires human checkpoint review and separate scale approval.
 
 ## Exit criteria (human gate)
