@@ -76,14 +76,17 @@
 
 ## 6. Review backend (optional)
 
-Omit this section to use the host's native reviewer/refuter. These are instructions
-for the coordinating agent, not a machine-parsed config. See
+Omit or leave this section unchanged to use independent reviewer/refuter contexts
+with the current session's model, provider and authentication. Do not ask for
+API settings unless the user explicitly selects a custom review API. These are
+instructions for the coordinating agent, not a machine-parsed config. See
 `playbook/review_backends.md` for native harness setup and API compatibility.
 
-- **Mode**: native (default) / custom-api
-- **Harness for custom-api**: codex / claude-code
-- **Model and API base URL**: <user-selected model and endpoint>
-- **Credential environment variable**: <variable name only; never the key>
-- **Local binding**: <configured Codex agent name or CLI launch settings>
-- **Refuter override**: <optional separate backend; otherwise use the same backend
-  in a fresh context>
+- **Mode**: native
+
+Only if the user selects `custom-api`, record their harness (`codex` or
+`claude-code`), model, API base URL, credential environment variable name if
+needed (never the key), and local binding (configured Codex agent name or CLI
+launch settings). An explicitly selected but incomplete setup stays pending;
+it does not silently fall back to native. Refutation uses the same backend in
+a fresh context unless the user explicitly selects a separate backend for it.

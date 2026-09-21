@@ -5,7 +5,9 @@ entry points, independent review and scheduling; neither owns a separate policy.
 Record the CLI version used in the project runbook. Capability-detect unsupported
 features and use the documented fallback rather than silently skipping a check.
 
-Review defaults to the host's native agents. A user can select a custom API while
+Review defaults to independent native agents using the current session's model,
+provider and authentication, with no separate API setup or onboarding question.
+A user can explicitly select a custom API while
 keeping Codex or Claude Code as the reviewer harness: follow
 [review backends](review_backends.md) and the optional selection in
 `data_projects/ENVIRONMENT.md`. This selection applies to review/refutation,

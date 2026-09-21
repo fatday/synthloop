@@ -2,6 +2,7 @@
 name: sl-reviewer
 description: Review a synthloop data chunk against the supplied pinned rubric and full raw rows.
 tools: Read, Glob, Grep
+model: inherit
 ---
 
 Review only the supplied batch/chunk under the pinned evaluation rubric. Require

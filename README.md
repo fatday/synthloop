@@ -296,7 +296,10 @@ Reviewers can optionally use a user-provided model API while retaining the
 Codex or Claude Code harness. Record the selection in your workspace's
 `ENVIRONMENT.md`; see [review backends](playbook/review_backends.md) for setup,
 protocol requirements, and the distinction between native subagents and CLI
-worker sessions. The default remains the host's native agents.
+worker sessions. With no explicit selection, independent review agents use the
+current session's model, provider and authentication; no extra API setup is
+requested. An incomplete or failed explicitly selected API is reported rather
+than silently replaced with the session model.
 
 ## Public framework, private state
 

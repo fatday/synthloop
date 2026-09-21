@@ -6,6 +6,34 @@ reviewer/refuter. `custom-api` keeps a Codex or Claude Code harness but selects
 the user's model service for those workers. This is an agent-operated setup,
 not a new synthloop runtime or automatic endpoint discovery.
 
+## Selection and defaults
+
+Resolve the backend from the user's latest explicit review-backend instruction,
+then their saved selection in `ENVIRONMENT.md`, otherwise use `native`.
+An explicit request to use the current session overrides a previously saved
+custom API selection. Record a changed selection for subsequent invocations.
+
+| Selection | Coordinator behavior |
+| --- | --- |
+| Section absent, blank, untouched template, or `native` | Spawn independent reviewer/refuter contexts using the current session's model and provider. Do not request an API URL/key or run custom-provider setup. |
+| Explicit `custom-api`, or the user explicitly supplies an API for review | Use the selected harness, model and endpoint for review workers only. Reuse this selection on resume. |
+| Custom API explicitly selected but required settings are missing | Ask only for the missing setup information; keep review pending. Do not silently switch to the session model. |
+| Selected custom API fails | Report the failure and leave review incomplete. Switch back to `native` only when the user requests it. |
+
+Native review inherits the current session's authentication too, whether the
+session uses a subscription or an already configured API. It needs no separate
+review credentials. Keep contexts independent even when models are identical.
+Do not pick a cheaper/different reviewer model unless the user selects it. If
+the host has a different subagent model default, explicitly select the current
+session model using the supported delegation controls; report an enforced
+override if that selection cannot be honored.
+
+Template examples, installed custom-agent definitions, environment variables,
+and API settings used for data generation do not opt review into `custom-api`.
+Do not discover keys or probe endpoints to fill an unselected option. Custom
+setup below applies only after the user selects it; a credential is required
+only when the chosen endpoint requires authentication.
+
 The harness executes tools and maintains the review context. A bare HTTP model
 call does not implement this option. The coordinator can use a different harness
 from the reviewer, provided the chosen CLI and evidence files are accessible.

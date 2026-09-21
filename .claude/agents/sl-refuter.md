@@ -2,6 +2,7 @@
 name: sl-refuter
 description: Independently challenge synthloop review findings against complete raw evidence.
 tools: Read, Glob, Grep
+model: inherit
 ---
 
 Given a claim, the pinned rubric, task contract and full raw row, try to disprove
