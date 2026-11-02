@@ -26,6 +26,7 @@ and following it, no tooling required:
 - `playbook/03_quality_loop.md` - the generate / QA / repair loop
 - `playbook/04_scale.md` - scale-up, monitoring, release, postmortem
 - `playbook/principles.md` - the distilled rules (read first)
+- `playbook/workspace_hygiene.md` - temp output, worktrees, data retention, disk audits
 - `playbook/review_rubric.md` - how review is conducted and reported
 
 Per-generator state lives under `data_projects/<name>/`, instantiated from
@@ -54,7 +55,7 @@ shortcut folders and follow this table.
 | `/smoke <name>` / `$sl-smoke` | Run the small-scale-generation steps in `playbook/03_quality_loop.md` 3.1 (commit first, generate, coverage tally, raw-row read). |
 | `/review <name>` / `$sl-review` | Run the dual-track QA in `playbook/03_quality_loop.md` 3.2 + `review_rubric.md` (deterministic checks, agent review with refutation pass + kill-rate, raw-row read, verdict). |
 | `/repair <name>` / `$sl-repair` | Run the diagnose-then-patch steps in `playbook/03_quality_loop.md` 3.4 (diagnosis, scoped fix, ratchet test). |
-| `/cycle <name> [target]` / `$sl-cycle` | Run the smoke → review → repair loop according to `playbook/03_quality_loop.md` 3.1-3.5. Stop at pass checkpoint, hard gate, rejection-wall signal, oscillation, regression, infra failure, or safety cap. Pass requires both Track A and Track B to clear target independently with coverage floors intact. Never auto-scale. |
+| `/cycle <name> [target]` / `$sl-cycle` | Run the smoke → review → repair loop according to `playbook/03_quality_loop.md` 3.1-3.5. Stop at pass checkpoint, hard gate, rejection-wall signal, oscillation, regression, plateau, infra failure, or safety cap. Pass requires both Track A and Track B to clear target independently with coverage floors intact. Never auto-scale. |
 | `/scale <name>` / `$sl-scale` | Run `playbook/04_scale.md` (preflight, launch, monitor, release, postmortem). Requires the scale-up human gate. |
 | `/status [name]` / `$sl-status` | Read `data_projects/*/progress.md` and print the portfolio table (generator, stage, next action, blocked-on, last-batch verdict); list projects with open questions for the human; flag staleness (a project whose next action has not changed across multiple sessions, or whose last entry is old relative to others). Read-only. |
 

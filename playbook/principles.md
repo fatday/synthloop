@@ -18,6 +18,16 @@ learn".
 
 ## 2. Diagnose, then patch — and repair monotonically
 
+**The target is cleared by raising RAW generation quality — never by shedding.**
+A batch reaches the pass bar only when the generator is good enough that the
+*whole accepted batch* passes both tracks (LLM review AND the deterministic
+check) ≥ target; you do NOT reach it by adding reject gates, filters, or any rule
+that drops hard rows to inflate the pass-rate. Tightening the denominator until
+the survivors look good is the cardinal anti-pattern — it ships a *narrower*
+dataset that scores high, which is strictly worse than an honest lower score on
+the full distribution. The fix for a low pass-rate is always "make the generator
+produce better rows," not "stop accepting the bad ones."
+
 Unsupervised repair loops patch the symptom the reviewer measured. They add
 filters and gates until pass-rate looks good while the data distribution
 quietly narrows (the rejection-wall failure: a well-meaning validator that
@@ -128,3 +138,13 @@ completeness theater. A per-chunk report nobody reads is process debt.
 When a process failure is found (not just a code bug), the fix includes
 updating this playbook or the templates. Playbooks rot in weeks otherwise,
 and a rotted playbook is worse than none because it is trusted.
+
+## 13. Measure against the noise
+
+A pass rate is a sample: report it with its n and interval, and treat a move
+inside the noise band (sampling interval plus reviewer spread) as no move.
+Decide before an A/B what effect it can detect; an A/B too small for the
+expected effect only produces numbers to over-read. When two consecutive
+rounds of one lever class move nothing beyond noise, the lever is spent: stop
+and look for a structural change instead of a third round (details:
+`03_quality_loop.md` §3.3).
