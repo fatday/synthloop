@@ -138,3 +138,13 @@ completeness theater. A per-chunk report nobody reads is process debt.
 When a process failure is found (not just a code bug), the fix includes
 updating this playbook or the templates. Playbooks rot in weeks otherwise,
 and a rotted playbook is worse than none because it is trusted.
+
+## 13. Measure against the noise
+
+A pass rate is a sample: report it with its n and interval, and treat a move
+inside the noise band (sampling interval plus reviewer spread) as no move.
+Decide before an A/B what effect it can detect; an A/B too small for the
+expected effect only produces numbers to over-read. When two consecutive
+rounds of one lever class move nothing beyond noise, the lever is spent: stop
+and look for a structural change instead of a third round (details:
+`03_quality_loop.md` §3.3).

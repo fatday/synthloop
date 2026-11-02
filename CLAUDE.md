@@ -67,6 +67,25 @@ generator unless explicitly doing a portfolio pass.
    proactively write a fresh full checkpoint and tell the human it is safe to
    `/compact`. (You cannot trigger `/compact` yourself; the human runs it or the
    harness auto-compacts — the complete checkpoint makes either lossless.)
+8. **State budgets — the resume point must stay readable.** `progress.md`
+   holds the current state (stage, next action, cursor, blockers, open
+   questions), the pinned sections (smoke spec, runbook, gates), the last ~10
+   entries of each ledger and the last ~5 cursor entries. At each stage exit, or
+   when it passes ~25 KB, move older entries and finished-investigation notes
+   VERBATIM to `progress_ledger.md` (append-only, newest first). Budgets are in
+   bytes and characters, not lines: an unwrapped line can hold a page. A cursor
+   entry is at most ~1,000 characters: what happened, the numbers that matter,
+   refs, the single next action; details live in the review and build files it
+   links. `project_memory.md` holds decisions in force and lessons; when it
+   passes ~25 KB, consolidate it (merge duplicate lessons, list superseded
+   decisions in one line each, keep the full text in
+   `project_memory_archive.md`) and promote lessons that generalize to
+   `playbook/`. The playbook follows the same rule: a new lesson merges into or
+   replaces an existing bullet before a new bullet is added.
+9. **Workspace hygiene.** Temp output, worktrees and data copies follow
+   `playbook/workspace_hygiene.md`: job-scoped scratch, worktrees listed in
+   `progress.md` and removed when their round closes, an audit at every stage
+   exit. Deleting anything still needs the human's approval (see below).
 
 ## Non-negotiable rules (summary of playbook/principles.md - that file is canonical)
 
@@ -97,6 +116,10 @@ generator unless explicitly doing a portfolio pass.
   coverage floor** the loop cannot move (so quality can't be gamed by shedding hard
   rows), and a cycle that applied any edit cannot pass (validate on a fresh
   same-commit batch first).
+- Every pass rate is reported with its n and 95% interval, and a change between
+  batches counts only when it exceeds the noise band (sampling interval and
+  reviewer spread). After two consecutive rounds of one lever class move
+  nothing beyond noise, stop that class and present structural options.
 - The reviewer rubric and the ratchet/eval harness are human-owned and
   **append-only** for the loop — add or tighten, never relax or weaken.
 - Every confirmed incident becomes a deterministic check or test (the ratchet).

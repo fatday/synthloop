@@ -11,8 +11,11 @@
 
 - **PASS / FAIL / NEEDS-HUMAN**: <one word + one sentence why>. PASS requires
   **BOTH tracks ≥ target, independently** (not combined).
-- **Track-B (LLM) pass-rate (accepted rows)**: <x.x%> vs target <95%>  — **worst cohort**: <cohort> <x.x%>
-- **Track-A (deterministic) pass-rate (accepted rows)**: <x.x%> vs target <95%>  — **worst cohort**: <cohort> <x.x%>
+- **Track-B (LLM) pass-rate (accepted rows)**: <x.x%> (n=<n>, 95% <lo>–<hi>) vs target <95%>  — **worst cohort**: <cohort> <x.x%> (n=<n>, 95% <lo>–<hi>)
+- **Track-A (deterministic) pass-rate (accepted rows)**: <x.x%> (n=<n>, 95% <lo>–<hi>) vs target <95%>  — **worst cohort**: <cohort> <x.x%>
+- **Pass within noise?** <yes/no> (yes when an interval reaches below the target; the gate is unchanged, the human sees it is marginal)
+- **Change vs v<N-1>**: <+/-x.x pts>; noise band <±y pts> (sampling interval of the difference plus reviewer spread) → <beyond noise / within noise>
+- **Lever class this round**: <class>; null rounds in a row for this class: <k> (2 → plateau stop, `03_quality_loop.md` §3.3)
 - **Both ≥ target?** <✅/❌>  (this is the pass test — each track on its own)
 - **Reviewed**: <N> rows (<stratification, e.g. cap per mode×backend, oversampled weak cohorts>)
 - **Commit / working-tree**: <hash or branch+state>   **Rubric scored against**: review_instructions/v<k>.md (pinned at last human checkpoint)
@@ -53,10 +56,10 @@ drag (counts against the dimension score but not auto-fail). **Problem labels**
 > **LLM** = Track-B reviewer Tier-1 verdict. `top problem` = most common finding
 > label.
 
-| generator | reviewed | det pass | LLM pass | both≥target? | T1 | deny-after-retr | avoidable | top problem |
+| generator | reviewed | det pass | LLM pass (95% interval) | both≥target? | T1 | deny-after-retr | avoidable | top problem |
 |---|---|---|---|---|---|---|---|---|
-| <generator> | <n> | <d>/<n> | <l>/<n> | <✅/❌> | <t1> | <deny> | <avoid> | <label (n)> |
-| **ALL** | <n> | <det%> | <llm%> | <✅/❌> | <t1> | — | — | — |
+| <generator> | <n> | <d>/<n> | <l>/<n> (<lo>–<hi>) | <✅/❌> | <t1> | <deny> | <avoid> | <label (n)> |
+| **ALL** | <n> | <det%> | <llm%> (<lo>–<hi>) | <✅/❌> | <t1> | — | — | — |
 
 ## Per-chunk pass-rate
 

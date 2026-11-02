@@ -68,6 +68,14 @@ before the expensive Track B. Two output classes, kept strictly separate:
 - Chunk the batch (25-50 rows per reviewer) using the current
   `review_instructions/v*.md`.
 - Reviewers must cite row ids and verbatim offending content.
+- **Grade statelessly where you can**: give each row to a fresh reviewer
+  context (one row per call, its verdict written to disk before the next row)
+  instead of one long session per chunk. A session re-reads its whole context
+  on every turn, so a chunk's cost grows with the square of its length, and long
+  sessions drift (rows read partially, verdicts attached to the wrong row).
+  Switching an established generator to stateless grading changes the
+  instrument: grade one earlier batch both ways before comparing across the
+  switch.
 - Verify substantive reading from model-visible tool output when review results
   depend on complete rows. Loading a file into a script, printing excerpts, or
   checking that a quote exists does not establish that the reviewer saw the
@@ -159,6 +167,34 @@ THREE readings of the FULL frozen control every cycle (a 10-row slice moves
 10pp per row), and report **batch − its own control mean, with the control's
 spread** beside the raw percentage. A raw Track-B delta across instruments is
 not evidence of anything.
+
+**Every pass rate carries its interval.** Report each one as
+`p (n, 95% interval)`; a Wilson interval is fine. Near 90% the interval is
+about ±6 points at n=100 and about ±3.5 at n=300. A pass whose interval
+reaches below the target is reported as "pass within noise", so the human sees
+that it is marginal; the gate itself does not change.
+
+**A change must exceed the noise band.** Two batches differ only when the
+difference is larger than both its sampling interval and the instrument's own
+spread: the control readings, or the split-half spread between two reviewers
+grading the same arm. Near 90% with 100 rows per arm, the smallest difference
+an A/B detects reliably (80% power, two-sided 5%) is about 12 points; with 300
+rows per arm, about 7. Reviewer spread comes on top of that.
+
+**State the detectable effect before an A/B.** Write down the effect you expect
+and the smallest effect the planned sample can detect. If the expected effect
+is smaller, change the design instead of running it: enlarge the sample, pair
+the arms (same seeds and worlds in both, so only the change differs), or
+measure the fix's own failure class (its count per 100 rows) instead of the
+overall pass rate. An arm that is drawn but changes nothing measures the
+instrument's noise floor for free.
+
+**Plateau rule.** When two consecutive rounds of the same lever class (prompt
+wording, check tuning, judge or checker changes, ...) move the pass rate by less
+than the noise band, stop iterating that class. Record it as measured-null in
+`project_memory.md` and present structural options to the human: a different
+model or writer, a different instrument, more data per decision, or accept and
+scale.
 
 ## 3.4 Repair: diagnose, then patch (monotonic)
 

@@ -192,6 +192,10 @@ or mid fix-&-add. To resume on its own without redoing work, every cycle keeps a
   STOP + diagnose. A STOP-to-diagnose may resume ONLY if the resolution is a
   generator/data fix; if the only fix is to weaken a gate/threshold/rubric/test,
   the loop stays stopped and presents to the human.
+- **Plateau** → two consecutive rounds of the same lever class moved the pass
+  rate by less than the noise band (`playbook/03_quality_loop.md` §3.3) → STOP
+  that class, record it as measured-null in `project_memory.md`, and present
+  structural options to the human.
 - **Safety cap** → stop after 6 cycles without a pass and summarize.
 - **Infra failure** (generation crash, missing data) → STOP with the error.
 
