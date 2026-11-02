@@ -7,8 +7,22 @@
 
 - **Stage**: 0-context | 1-design | 2-implement | 3-quality-loop | 4-scale
 - **Next action** (one line, concrete):
+- **Cycle cursor** (autonomous loop): `<n> · SMOKE|REVIEW|FIX&ADD|IDLE · <resume handle>`
 - **Blocked on** (if anything):
 - **Open questions for the human**:
+
+## Smoke spec
+
+> Pinned ONCE — elicited by `/smoke` on the first run if absent, then launched
+> verbatim. `/smoke` and `/cycle` never re-ask unless the human says to change
+> it, and each launch is asserted to match this spec (mismatch → STOP).
+
+- Generators (which / bring-up order):
+- Batch size (bs):
+- Model:
+- Time-box per run:
+- Nodes per generator:
+- max-model-len / other launch flags:
 
 ## Runbook
 

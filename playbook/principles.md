@@ -18,6 +18,16 @@ learn".
 
 ## 2. Diagnose, then patch — and repair monotonically
 
+**The target is cleared by raising RAW generation quality — never by shedding.**
+A batch reaches the pass bar only when the generator is good enough that the
+*whole accepted batch* passes both tracks (LLM review AND the deterministic
+check) ≥ target; you do NOT reach it by adding reject gates, filters, or any rule
+that drops hard rows to inflate the pass-rate. Tightening the denominator until
+the survivors look good is the cardinal anti-pattern — it ships a *narrower*
+dataset that scores high, which is strictly worse than an honest lower score on
+the full distribution. The fix for a low pass-rate is always "make the generator
+produce better rows," not "stop accepting the bad ones."
+
 Unsupervised repair loops patch the symptom the reviewer measured. They add
 filters and gates until pass-rate looks good while the data distribution
 quietly narrows (the rejection-wall failure: a well-meaning validator that

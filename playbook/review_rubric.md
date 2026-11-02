@@ -52,10 +52,20 @@ not trusted. Judges drift; the backstop is cheap.
 
 ## Report format
 
-One summary per batch:
-- Verdict line first (pass / fail and why, one sentence).
-- Confirmed findings: id + verbatim evidence + suspected mechanism, grouped
-  by class, ordered by severity.
-- Score and coverage distributions vs the design spec's numbers.
+One durable summary per batch, written to `reviews/v<N>.md` from
+`templates/review_summary.md` (not just reported in chat — it is the human's
+scannable record of every iteration). It contains:
+- Verdict line first (pass / fail and why, one sentence) + Track-B pass-rate vs
+  target and the worst cohort.
+- **Per-row problem table**: one line per confirmed (post-refutation) row-level
+  finding — row stable id (seed) + line index, generator, mode/backend cohort,
+  severity (T1/T2), problem label (controlled vocabulary), and a one-line detail
+  with the offending value. This makes "what is wrong with which row" directly
+  scannable, not buried in prose. A problem tally (label × severity, Δ vs prior
+  version) sits beside it.
+- Confirmed findings narrative: verbatim evidence + suspected mechanism, grouped
+  by class, ordered by severity (the table's detail column links to these).
+- Track-A sweep digest, score/coverage distributions vs the spec, and
+  coverage/yield deltas vs the prior version.
 - What was checked and found clean (so absence of findings is informative).
-- Open questions for the human, separated from findings.
+- Open questions for the human, separated from findings, + the single next action.
